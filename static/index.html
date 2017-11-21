@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="拓扑图编辑器">
+    <meta name="description" content="拓扑图编辑器">
+    <title>拓扑图编辑器</title>
+
+    <link rel="stylesheet" href="asset/lib/eui/16.12/ui.min.css">
+    <link rel="stylesheet" href="asset/index.css">
+</head>
+<body>
+<header class="layout-header navbar navbar-light">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/"><h1>拓扑图</h1></a>
+        </div>
+        <div id="navbar-collapse" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav" id="menu-layoutit">
+                 <li class="nav-item">
+                    <a class="nav-link" href="/" target="_blank">首页</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav pull-right">
+                <!--<li class="nav-item">
+                    <a class="nav-link" href="http://yunser.com/8.html" target="_blank">留言</a>
+                </li>-->
+            </ul>
+
+        </div>
+    </div>
+</header>
+<div class="layout-tool">
+    <div>
+        <label><input type="radio" name="type">默认</label>
+        <label><input type="radio" name="type">框选</label>
+        <label><input type="radio" name="type">加线</label>
+        <button>居中显示</button>
+        <button>全屏显示</button>
+        <button>放大</button>
+        <button>缩小</button>
+        <label><input type="checkbox">鼠标缩放</label>
+
+        <input>
+        <button>查询</button>
+        <button>旋转克隆</button>
+        <button>导出 PNG</button>
+        <button>导出 PDF</button>
+
+    </div>
+</div>
+<div class="layout-body">
+    <div class="layout-content">
+        <canvas id="canvas" style="" width="800" height="500"></canvas>
+    </div>
+    <div id="app" class="layout-side">
+        <div>{{ message }}</div>
+        <button @click="node">Mode</button>
+        <button @click="star">star</button>
+        <button @click="star2">star2</button>
+        <button @click="link">link</button>
+        <button @click="uml">UML</button>
+        <button @click="tree">tree</button>
+        <button @click="device">device</button>
+        <button @click="container">container</button>
+        <button @click="container1">container1</button>
+        <button @click="clear">清空</button>
+        <hr>
+        随机生成1万个节点、5000条连线：
+        <button @click="testing">性能测试（100节点）</button>
+        用时：0.656 秒.
+
+        <button @click="exportJson">导出 JSON</button>
+        <button @click="clear">加载 JSON</button>
+        <code>
+            <pre>{
+    []
+}</pre>
+        </code>
+
+    </div>
+</div>
+
+<script src="https://cdn.bootcss.com/vue/2.3.4/vue.min.js"></script>
+<script src="asset/lib/jquery/jquery-1.10.2.min.js"></script>
+<script src="asset/lib/svgjs/svg.js"></script>
+<!--<script src="asset/lib/FileSaver.min.js"></script>-->
+
+<!--
+<script async="" src="https://cdn.rawgit.com/eligrey/Blob.js/0cef2746414269b16834878a8abc52eb9d53e6bd/Blob.js"/>
+<script async="" src="https://cdn.rawgit.com/eligrey/canvas-toBlob.js/f1a01896135ab378aa5c0118eadd81da55e698d8/canvas-toBlob.js"/>
+<script async="" src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"/>
+-->
+
+
+<script src="bundle.js"></script>
+
+<!--<script src="asset/index.js"></script>-->
+</body>
+</html>

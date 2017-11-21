@@ -1,0 +1,42 @@
+.container {
+    width: 100%;
+}
+.layout-header {
+    border-bottom: 1px solid #ccc;
+}
+canvas {
+    background-color:#EEEEEE;
+    border:1px solid #444;
+}
+.layout-tool {
+    position: absolute;
+    top: 52px;
+    right: 0;
+    left: 0;
+    height: 50px;
+    padding: 16px;
+    border-bottom: 1px solid #ccc;
+}
+.layout-body {
+    position: absolute;
+    top: 102px;
+    right: 0;
+    left: 0;
+    bottom: 0;
+}
+.layout-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 320px;
+    bottom: 0;
+    border-right: 1px solid #ccc;
+}
+.layout-side {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 320px;
+    bottom: 0;
+    background-color: #eee;
+}
