@@ -114,7 +114,7 @@
 			var node1 = genNode(node.x, node.y , node.width, beginDegree, endDegree);
 			var node2 = genNode(node.x- 2 + Math.random()*4, node.y , node.width, beginDegree + Math.PI, beginDegree);
 
-			node.setVisible(false);
+			node.visible = false
 
 			box.add(node1);
 			box.add(node2);
@@ -153,10 +153,10 @@
 		var box = option.context;
 		node.isSelected = function(){ return false;	};
 		node.isFocus = function(){return false;	};
-		node.setDragable(false);
+		node.dragable = false
 
 		function initNode(node){
-			node.setVisible(true);
+			node.visible = true
 			node.rotate = Math.random();
 			var w = box.canvas.width/2;
 			node.x = w + Math.random() * (w - 100)  -   Math.random() * (w - 100);
