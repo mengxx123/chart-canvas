@@ -17,16 +17,6 @@ More about please to see samples.
 
 ## Example
 
-
-滤镜
-模糊
-阴影
-渐变
-
-rotate
-
-路径文字
-
 ## Build Setup
 
 ``` bash

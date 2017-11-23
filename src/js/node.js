@@ -60,7 +60,7 @@ class Node extends AbstractNode {
 
         let strokeStyle = 'rgba(255, 0, 0, 0.9)'
         if (this.isSelected()) {
-            strokeStyle = '#09c'
+            strokeStyle = '#000'
         }
 
         ctx.strokeStyle = strokeStyle

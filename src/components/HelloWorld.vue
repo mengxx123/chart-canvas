@@ -35,10 +35,11 @@
                 <button>全屏显示</button>
                 <button>放大</button>
                 <button>缩小</button>
-                <label><input type="checkbox">鼠标缩放</label>
+                <label>
+                    <input type="checkbox">鼠标缩放</label>
 
-                <input>
-                <button>查询</button>
+                <input v-model="keyword">
+                <button @click="search">查询</button>
                 <button>旋转克隆</button>
                 <button>导出 PNG</button>
                 <button>导出 PDF</button>
@@ -50,7 +51,6 @@
                 <canvas id="canvas" style="" width="800" height="500"></canvas>
             </div>
             <div id="app" class="layout-side">
-                <div>{{ message }}</div>
                 <button @click="node">Mode</button>
                 <button @click="star">star</button>
                 <button @click="star2">star2</button>
@@ -81,12 +81,13 @@
 </template>
 
 <script>
+    import '@/js/main'
     import DataBox from '@/js/databox'
     
     export default {
         data() {
             return {
-                message: 'Hello Vue!'
+                keyword: ''
             }
         },
         mounted() {
@@ -157,6 +158,9 @@
             box.updateView();
         },
         methods: {
+            search() {
+                this.box.search(this.keyword)
+            },
             exportJson() {
                 console.log(this.box.getJson())
             },

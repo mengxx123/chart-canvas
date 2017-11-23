@@ -88,6 +88,20 @@ class DataBox {
         return e
     }
 
+    // 搜索，并选中匹配的元素 TODO 定位匹配的元素
+    search(keyword) {
+        console.log('搜索')
+        this.cancleAllSelected()
+        for (let i = 0; i < this.nodes.length; i++) {
+            let node = this.nodes[i]
+            if (node.name && node.name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1) {
+                node.selected = true
+                this.selectedElements.push(node)
+            }
+        }
+        this.updateView()
+    }
+
     getElementByName(name) {
         for (var i = this.nodes.length - 1; i >= 0; i--) {
             if (this.nodes[i].getName() == name) {
@@ -128,8 +142,14 @@ class DataBox {
 
         var selectedNode = box.getElementByXY(x, y)
         if (selectedNode) {
-            selectedNode.onMousedown({x: x, y: y, context: box})
-            box.currElement = selectedNode
+            if (this.ctrlDown) {
+                selectedNode.onMousedown({x: x, y: y, context: box})
+                box.currElement = selectedNode
+            } else {
+                selectedNode.onMousedown({x: x, y: y, context: box})
+                box.currElement = selectedNode
+            }
+
         } else if (box.currElement) {
             box.currElement.cancleSelected()
             box.currElement = null
@@ -283,6 +303,9 @@ class DataBox {
                 })
                 box.updateView()
                 return false
+            case 17:
+                this.ctrlDown = true
+                break
         }
     }
 
@@ -290,6 +313,11 @@ class DataBox {
         var box = this
         var keyID = e.keyCode ? e.keyCode : e.which
         box.publish('keyup', keyID)
+        switch (e.keyCode) {
+            case 17:
+                this.ctrlDown = false
+                break
+        }
         box.updateView()
     }
 
