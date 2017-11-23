@@ -70,10 +70,6 @@ class Node extends AbstractNode {
         ctx.rotate(this.rotate)
         ctx.scale(this.scala, this.scala)
 
-        if (this.isSelected() || this.isFocus()) {
-            this.drawSelectedRect(ctx)
-        }
-
         let image = this.getImage()
         if (image != null) {
             //ctx.rect(-this.width/2, -this.height/2, this.width, this.height)
@@ -87,6 +83,11 @@ class Node extends AbstractNode {
             ctx.closePath()
         }
         this.drawText(ctx)
+
+        if (this.isSelected() || this.isFocus()) {
+            this.drawSelectedRect(ctx)
+        }
+
         if (this.isTipVisible) {
             this.drawTip(ctx)
         }

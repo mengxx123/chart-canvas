@@ -67,7 +67,7 @@
                 用时：0.656 秒.
 
                 <button @click="exportJson">导出 JSON</button>
-                <button @click="clear">加载 JSON</button>
+                <button @click="loadJson">加载 JSON</button>
                 <code>
             <pre>{
     []
@@ -156,8 +156,12 @@
             box.updateView();
         },
         methods: {
-            exportJson: function exportJson() {
-                console.log(box.getJson());
+            exportJson() {
+                console.log(this.box.getJson())
+            },
+            loadJson() {
+                let json = '{"version":"1.0","title":"测试文件"}'
+                this.box.loadJson(json)
             },
             testing: function testing() {
                 var start = new Date().getTime();

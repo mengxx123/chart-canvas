@@ -10,6 +10,7 @@ import util from './util'
 import Layout from './layout'
 
 class DataBox {
+
     constructor(name, canvas) {
         this.name = name
         this.canvas = canvas
@@ -20,6 +21,8 @@ class DataBox {
         this.image = new Image()
         this.image.src = '/static/img/bg.jpg'
         this.init()
+        this.children = []
+        this.viewBox = [0, 0, 800, 500]
     }
 
     init() {
@@ -312,22 +315,26 @@ class DataBox {
         return this.add(e)
     }
 
-    add(e) {
-        if (this.elementMap[e.id] != null) {
+    add(element) {
+        if (this.elementMap[element.id]) { // 防止重复添加？
             return
         }
-        if (!e.id) e.id = $.now()
-        if (!e.z) e.z = this.elements.length
-        this.elements.push(e)
-
-        if (e instanceof Container) {
-            this.containers.push(e)
-        } else if (e instanceof Link) {
-            this.links.push(e)
-        } else if (e instanceof Node) {
-            this.nodes.push(e)
+        if (!element.id) {
+            element.id = $.now()
         }
-        this.elementMap[e.id] = e
+        if (!element.z) {
+            element.z = this.elements.length
+        }
+        this.elements.push(element)
+
+        if (element instanceof Container) {
+            this.containers.push(element)
+        } else if (element instanceof Link) {
+            this.links.push(element)
+        } else if (element instanceof Node) {
+            this.nodes.push(element)
+        }
+        this.elementMap[element.id] = element
     }
 
     clear() {
@@ -469,6 +476,24 @@ class DataBox {
             if (this.nodes[i].x + this.nodes[i].width < 0 || this.nodes[i].x > box.canvas.width) continue
             this.nodes[i].draw(this.ctx)
         }
+    }
+
+    // 导出 JSON
+    getJson() {
+        let obj = {
+            version: '1.0',
+            title: '测试文件'
+        }
+        return JSON.stringify(obj)
+    }
+
+    // 加载 JSON
+    loadJson(json) {
+        let obj = JSON.parse(json)
+        console.log(obj)
+        // if (obj.version) {
+        //
+        // }
     }
 }
 

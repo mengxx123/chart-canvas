@@ -1,4 +1,5 @@
 class Element {
+
     constructor() {
         this.id = 'topo_' + new Date().getTime() // TODO
         this.getFloatMenu = null
