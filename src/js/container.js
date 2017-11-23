@@ -102,7 +102,7 @@ class Container extends Element {
 }
 
 function GhomboidContainer(){
-    var container = new JTopo.Container()
+    var container = new Container()
     container.offset = 50
     container.draw = function(ctx){
         this.updateBound()
@@ -127,7 +127,7 @@ function GhomboidContainer(){
 }
 
 function GridContainer(){
-    var container = new JTopo.Container()
+    var container = new Container()
     container.rows = 3
     container.cols = 2
     container.cellWidth = 60
@@ -204,7 +204,7 @@ function GridContainer(){
 }
 
 function OneItemContainer(){
-    var container = new JTopo.GridContainer()
+    var container = new GridContainer()
     container.rows = 1
     container.cols = 1
     container.cellWidth = 50
@@ -218,9 +218,4 @@ function OneItemContainer(){
     return container
 }
 
-JTopo.Container = Container
-JTopo.GridContainer = GridContainer
-JTopo.OneItemContainer = OneItemContainer
-JTopo.GhomboidContainer = GhomboidContainer
-
-export default Container
+export {Container, GridContainer, OneItemContainer, GhomboidContainer}

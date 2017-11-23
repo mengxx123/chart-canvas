@@ -227,6 +227,4 @@ class Element {
     }
 }
 
-JTopo.Element = Element
-
 export default Element

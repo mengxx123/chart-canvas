@@ -61,8 +61,10 @@ function getBusPositions(x, y, count, r, vertical, dir){
     return result;
 }
 
-JTopo.Layout = {
+let Layout = {
     getStarPositions : getStarPositions,
     getTreePositions : getTreePositions,
     getBusPositions : getBusPositions
-};
+}
+
+export default Layout

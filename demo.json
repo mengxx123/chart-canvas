@@ -1,0 +1,92 @@
+{
+    "version": "17.6",
+    "data": [
+        {
+            "type": "line",
+            "id": "shape-1",
+            "name": "直线",
+            "x": 0,
+            "y": 0,
+            "width": 50,
+            "height": 50
+        },
+        {
+            "type": "rect",
+            "id": "shape-2",
+            "name": "简单的矩形",
+            "x": 0,
+            "y": 0,
+            "width": 50,
+            "height": 50,
+            "style": {
+                "stoke-color": "#000",
+                "stoke-width": 2,
+                "fill-color": "#09c",
+                "fill-opacity": 0.5
+            }
+        },
+        {
+            "type": "circle",
+            "id": "shape-3",
+            "name": "简单的圆形",
+            "x": 0,
+            "y": 0,
+            "width": 50,
+            "height": 50
+        },
+        {
+            "type": "ellipse",
+            "id": "shape-4",
+            "name": "简单的椭圆",
+            "x": 0,
+            "y": 0,
+            "width": 50,
+            "height": 50
+        },
+        {
+            "type": "polyline",
+            "id": "shape-5",
+            "name": "弯弯曲曲的折线",
+            "points": "0,0 0,20 20,20 20,40 40,40 40,60"
+        },
+        {
+            "type": "path",
+            "id": "shape-6",
+            "name": "我也是三角形",
+            "path": "M150 0 L75 200 L225 200 Z"
+        },
+        {
+            "type": "text",
+            "id": "shape-7",
+            "name": "简单的文本",
+            "text": "这是一段简单的文本",
+            "attr": {
+                "x": 0,
+                "y": 0,
+                "width": 50,
+                "height": 50
+            },
+            "style": {
+                "color": "#f00"
+            }
+        },
+        {
+            "type": "image",
+            "id": "shape-7",
+            "name": "简单的图片",
+            "image": "baidu.jpg",
+            "attr": {
+                "x": 0,
+                "y": 0,
+                "width": 50,
+                "height": 50
+            }
+        }
+    ],
+    "scale": 0.9325267339448919,
+    "width": "300",
+    "height": "300",
+    "viewbox": [0 ,0, 300, 300],
+    "tx": 105.39926531804349,
+    "ty": 168.69534931023514
+}

@@ -80,6 +80,8 @@
 </template>
 
 <script>
+    import DataBox from '@/js/databox'
+    
     export default {
         data() {
             return {
@@ -87,62 +89,62 @@
             }
         },
         mounted() {
-            var box = new JTopo.DataBox('dataBox', $("#canvas")[0]);
+            var box = new DataBox('dataBox', $("#canvas")[0]);
             box.isShowRange = false;
             this.box = box
             //box.viewbox()
             //box.setBg('');
 
-            var node = new JTopo.Node('Hello world!');
+            var node = new Topo.Node('Hello world!');
             node.setLocation(0, 0);
             box.add(node);
 
-            var defaultNode = new JTopo.Node('Node');
+            var defaultNode = new Topo.Node('Node');
             defaultNode.setLocation(200, 100);
             defaultNode.rotate = Math.PI/10;
             box.add(defaultNode);
 
-            var tipNode = new JTopo.TipNode('a tip.');
+            var tipNode = new Topo.TipNode('a tip.');
             tipNode.setLocation(540, 100);
             box.add(tipNode);
 
-            var textNode = new JTopo.TextNode('This is a Text node.');
+            var textNode = new Topo.TextNode('This is a Text node.');
             textNode.setLocation(317, 310);
             box.add(textNode);
 
-            var peopleNode = new JTopo.Node('people');
+            var peopleNode = new Topo.Node('people');
             peopleNode.setLocation(500, 200);
             peopleNode.setSize(64, 64);
             peopleNode.setImage('/static/img/person.png');
             box.add(peopleNode);
 
-            var circleNode = new JTopo.CircleNode()
+            var circleNode = new Topo.CircleNode()
             circleNode.style.fillStyle = '0, 0, 255';
             circleNode.setLocation(390, 90);
             box.add(circleNode);
 
-            var heartNode = new JTopo.HeartNode();
+            var heartNode = new Topo.HeartNode();
             heartNode.style.fillStyle = '255, 0, 0';
             heartNode.setLocation(300, 170);
             box.add(heartNode);
 
-            var group = new JTopo.GhomboidContainer("vmgroup");
+            var group = new Topo.GhomboidContainer("vmgroup");
             group.style = {fillStyle: '0, 0, 100'};
             group.add(circleNode);
             group.add(heartNode);
 
-            var hostNode = new JTopo.Node();
+            var hostNode = new Topo.Node();
             hostNode.setImage('/static/img/cloud.png');
             hostNode.setSize(64, 64);
             hostNode.setLocation(360,190);
             box.add(hostNode);
 
             for (var i = 0; i < 8; i++) {
-                var node = new JTopo.Node();
+                var node = new Topo.Node();
                 node.setImage('/static/img/laptop.png');
                 node.setSize(64, 64);
                 box.add(node);
-                box.add(new JTopo.Link(hostNode, node));
+                box.add(new Topo.Link(hostNode, node));
             }
 
             hostNode.layout = {type: 'star', radius:160};
@@ -160,17 +162,17 @@
             testing: function testing() {
                 var start = new Date().getTime();
                 for (var i = 0; i < 1000; i++) {
-                    var node = new JTopo.Node();
+                    var node = new Topo.Node();
                     node.x = Math.random() * box.width;
                     node.y = Math.random() * box.height;
                     box.add(node);
 
-                    var node2 = new JTopo.Node();
+                    var node2 = new Topo.Node();
                     node2.x = Math.random() * box.width;
                     node2.y = Math.random() * box.height;
                     box.add(node2);
 
-                    box.add(new JTopo.Link(node, node2));
+                    box.add(new Topo.Link(node, node2));
                 }
 
                 box.updateView();
@@ -184,32 +186,32 @@
             },
             container1: function container1() {
                 function HostNode(name) {
-                    var node = new JTopo.Node(name);
+                    var node = new Topo.Node(name);
                     node.setType('host');
                     return node;
                 }
                 function VmNode(name) {
-                    var node = new JTopo.Node(name);
+                    var node = new Topo.Node(name);
                     node.setType('vm');
                     return node;
                 }
 
                 var nodeA = null;
                 (function () {
-                    var node0 = new JTopo.GhomboidNode('vm_0');
+                    var node0 = new Topo.GhomboidNode('vm_0');
                     node0.setLocation(34, 181);
                     box.add(node0);
 
-                    var node1 = new JTopo.GhomboidNode('vm_1');
+                    var node1 = new Topo.GhomboidNode('vm_1');
                     node1.setLocation(244, 191);
                     box.add(node1);
                     nodeA = node1;
 
-                    var node2 = new JTopo.GhomboidNode('vm_2');
+                    var node2 = new Topo.GhomboidNode('vm_2');
                     node2.setLocation(281, 94);
                     box.add(node2);
 
-                    var group = new JTopo.GhomboidContainer("vmgroup");
+                    var group = new Topo.GhomboidContainer("vmgroup");
                     group.style = { fillStyle: '0, 100, 0' };
                     group.add(node0);
                     group.add(node1);
@@ -219,45 +221,45 @@
                 })();
 
                 (function () {
-                    var node0 = new JTopo.GhomboidNode('vm_0');
+                    var node0 = new Topo.GhomboidNode('vm_0');
                     node0.setLocation(11, 393);
                     box.add(node0);
 
-                    var node1 = new JTopo.GhomboidNode('vm_1');
+                    var node1 = new Topo.GhomboidNode('vm_1');
                     node1.setLocation(213, 292);
                     box.add(node1);
 
-                    var node2 = new JTopo.GhomboidNode('vm_2');
+                    var node2 = new Topo.GhomboidNode('vm_2');
                     node2.setLocation(285, 345);
                     box.add(node2);
 
-                    var group = new JTopo.GhomboidContainer("vmgroup");
+                    var group = new Topo.GhomboidContainer("vmgroup");
                     group.style = { fillStyle: '0, 0, 100' };
                     group.add(node0);
                     group.add(node1);
                     group.add(node2);
 
-                    box.add(new JTopo.FoldLink(nodeA, node1));
+                    box.add(new Topo.FoldLink(nodeA, node1));
 
                     box.add(group);
                 })();
             },
             container: function container() {
                 (function () {
-                    var text1 = new JTopo.TextNode('Shelf-1');
+                    var text1 = new Topo.TextNode('Shelf-1');
                     text1.setLocation(190, 300);
                     box.add(text1);
 
-                    var text1 = new JTopo.TextNode('Shelf-2');
+                    var text1 = new Topo.TextNode('Shelf-2');
                     text1.setLocation(390, 300);
                     box.add(text1);
 
-                    var text1 = new JTopo.TextNode('Shelf-2');
+                    var text1 = new Topo.TextNode('Shelf-2');
                     text1.setLocation(590, 300);
                     box.add(text1);
 
                     function GravityNode(name) {
-                        var node = new JTopo.Node(name);
+                        var node = new Topo.Node(name);
                         node.inContainer = function (target) {
                             return true;
                         };
@@ -266,7 +268,7 @@
                         };
                         return node;
                     }
-                    var node0 = new JTopo.Node('node');
+                    var node0 = new Topo.Node('node');
                     node0.setType('host');
                     box.add(node0);
 
@@ -283,16 +285,16 @@
                         box.add(node);
                     }
 
-                    var group = new JTopo.GridContainer("hostgroup");
+                    var group = new Topo.GridContainer("hostgroup");
                     group.x = 150;group.y = 100;
                     box.add(group);
 
-                    var group = new JTopo.GridContainer("hostgroup");
+                    var group = new Topo.GridContainer("hostgroup");
                     group.x = 350;group.y = 100;
                     group.add(node0);
                     box.add(group);
 
-                    var group = new JTopo.GridContainer("hostgroup2");
+                    var group = new Topo.GridContainer("hostgroup2");
                     group.x = 550;group.y = 150;
                     group.rows = 2;group.cols = 4;
                     group.style = { fillStyle: '255, 200, 254' };
@@ -303,7 +305,7 @@
                 box.image.src = '/static/img/room.jpg';
 
                 for (var i = 0; i < 5; i++) {
-                    var pcNode = new JTopo.Node('pc');
+                    var pcNode = new Topo.Node('pc');
                     pcNode.setImage('/static/img/acer-samll.jpg');
                     pcNode.width = 65;
                     pcNode.height = 124;
@@ -311,7 +313,7 @@
                     box.add(pcNode);
                 }
 
-                var vmNode = new JTopo.Node();
+                var vmNode = new Topo.Node();
                 vmNode.setImage('/static/img/vm_inner.jpg');
                 vmNode.width = 900;
                 vmNode.height = 600;
@@ -335,14 +337,14 @@
                 });
             },
             tree: function tree() {
-                var hostNode = new JTopo.Node();
+                var hostNode = new Topo.Node();
                 hostNode.setLocation(360, 190);
                 this.box.add(hostNode);
 
                 for (var i = 1; i < 6; i++) {
-                    var node = new JTopo.Node();
+                    var node = new Topo.Node();
                     this.box.add(node);
-                    this.box.add(new JTopo.Link(hostNode, node));
+                    this.box.add(new Topo.Link(hostNode, node));
                 }
 
                 //direction:'right top
@@ -358,132 +360,132 @@
                     getName: function getName() {}, setName: function setName() {}
                 };
 
-                var userNode = new JTopo.UMLClassNode('User');
+                var userNode = new Topo.UMLClassNode('User');
                 userNode.classObj = User;
                 userNode.setLocation(377, 77);
                 this.box.addElement(userNode);
 
-                var accountNode = new JTopo.UMLClassNode('Account');
+                var accountNode = new Topo.UMLClassNode('Account');
                 accountNode.operations = ['+ add(user) :Integer', '+ getUsers :List'];
                 accountNode.attributes = ['- id :String', '+ users :List'];
                 accountNode.setLocation(92, 221);
                 this.box.addElement(accountNode);
 
-                var resourceNode = new JTopo.UMLClassNode('Resource');
+                var resourceNode = new Topo.UMLClassNode('Resource');
                 resourceNode.operations = [];
                 resourceNode.attributes = ['- id :String', '+ accounts :List', '+ type :String'];
                 resourceNode.setLocation(381, 351);
                 this.box.addElement(resourceNode);
 
-                this.box.addElement(new JTopo.ArrowsFoldLink(userNode, accountNode));
-                this.box.addElement(new JTopo.ArrowsLink(userNode, resourceNode));
+                this.box.addElement(new Topo.ArrowsFoldLink(userNode, accountNode));
+                this.box.addElement(new Topo.ArrowsLink(userNode, resourceNode));
 
                 this.box.updateView();
             },
             link: function link() {
                 (function () {
-                    var nodeA = new JTopo.Node('NodeA');
+                    var nodeA = new Topo.Node('NodeA');
                     nodeA.setType('host');
                     nodeA.setLocation(300, 100);
                     box.add(nodeA);
 
-                    var nodeB = new JTopo.Node('NodeB');
+                    var nodeB = new Topo.Node('NodeB');
                     nodeB.setType('host');
                     nodeB.setLocation(130, 200);
                     box.add(nodeB);
 
-                    var link = new JTopo.CurveLink(nodeA, nodeB);
+                    var link = new Topo.CurveLink(nodeA, nodeB);
                     box.add(link);
                 })();
 
                 (function () {
-                    var nodeA = new JTopo.CircleNode();
+                    var nodeA = new Topo.CircleNode();
                     nodeA.setType('host');
                     nodeA.setLocation(50, 420);
                     box.add(nodeA);
 
-                    var nodeB = new JTopo.CircleNode();
+                    var nodeB = new Topo.CircleNode();
                     nodeB.setLocation(300, 420);
                     box.add(nodeB);
 
-                    var link = new JTopo.Link(nodeA, nodeB);
+                    var link = new Topo.Link(nodeA, nodeB);
                     box.add(link);
                 })();
 
                 (function () {
-                    var nodeD = new JTopo.Node('NodeD');
+                    var nodeD = new Topo.Node('NodeD');
                     nodeD.setType('host');
                     nodeD.setLocation(350, 210);
                     box.add(nodeD);
 
-                    var nodeE = new JTopo.Node('NodeE');
+                    var nodeE = new Topo.Node('NodeE');
                     nodeE.setType('zone');
                     nodeE.setLocation(470, 100);
                     box.add(nodeE);
 
-                    var nodeC = new JTopo.Node('NodeC');
+                    var nodeC = new Topo.Node('NodeC');
                     nodeC.setType('host');
                     nodeC.setLocation(540, 300);
                     box.add(nodeC);
 
-                    var nodeH = new JTopo.Node('NodeG');
+                    var nodeH = new Topo.Node('NodeG');
                     nodeH.setType('host');
                     nodeH.setLocation(540, 400);
                     box.add(nodeH);
 
-                    var nodeG = new JTopo.Node('NodeH');
+                    var nodeG = new Topo.Node('NodeH');
                     nodeG.setType('host');
                     nodeG.setLocation(350, 360);
                     box.add(nodeG);
 
-                    var link = new JTopo.FoldLink(nodeD, nodeE);
+                    var link = new Topo.FoldLink(nodeD, nodeE);
                     box.add(link);
 
-                    var link2 = new JTopo.FoldLink(nodeE, nodeC);
+                    var link2 = new Topo.FoldLink(nodeE, nodeC);
                     link2.fold = 'y';
                     box.add(link2);
 
-                    var link3 = new JTopo.FoldLink(nodeE, nodeG);
+                    var link3 = new Topo.FoldLink(nodeE, nodeG);
                     link3.fold = 'y';
                     box.add(link3);
 
-                    var link4 = new JTopo.FoldLink(nodeE, nodeH);
+                    var link4 = new Topo.FoldLink(nodeE, nodeH);
                     link4.fold = 'y';
                     box.add(link4);
                 })();
             },
             node: function node() {
-                var defaultNode = new JTopo.Node('Node');
+                var defaultNode = new Topo.Node('Node');
                 defaultNode.setLocation(200, 100);
                 defaultNode.rotate = Math.PI / 10;
                 box.add(defaultNode);
 
-                var tipNode = new JTopo.TipNode('a tip.');
+                var tipNode = new Topo.TipNode('a tip.');
                 tipNode.setLocation(540, 100);
                 box.add(tipNode);
 
-                var textNode = new JTopo.TextNode('This is a Text node.');
+                var textNode = new Topo.TextNode('This is a Text node.');
                 textNode.setLocation(317, 310);
                 _node.style.fontSize = '16pt';
                 box.add(textNode);
 
-                var peopleNode = new JTopo.Node('people');
+                var peopleNode = new Topo.Node('people');
                 peopleNode.setLocation(500, 200);
                 peopleNode.setSize(64, 64);
                 peopleNode.setImage('/static/img/person.png');
                 box.add(peopleNode);
 
-                var circleNode = new JTopo.CircleNode();
+                var circleNode = new Topo.CircleNode();
                 circleNode.style.fillStyle = '0, 0, 255';
                 circleNode.setLocation(390, 90);
                 box.add(circleNode);
 
-                var heartNode = new JTopo.HeartNode();
+                var heartNode = new Topo.HeartNode();
                 heartNode.style.fillStyle = '255, 0, 0';
                 heartNode.setLocation(300, 170);
                 box.add(heartNode);
 
-                var group = new JTopo.GhomboidContainer("vmgroup");
+                var group = new Topo.GhomboidContainer("vmgroup");
                 group.style = { fillStyle: '0, 0, 100' };
                 group.add(peopleNode);
                 group.add(defaultNode);
@@ -491,7 +493,7 @@
                 box.updateView();
             },
             star2: function star2() {
-                var cNode = new JTopo.Node();
+                var cNode = new Topo.Node();
                 cNode.setLocation(360, 100);
                 cNode.setImage('/static/img/cloud.png');
                 cNode.setSize(64, 64);
@@ -500,12 +502,12 @@
 
                 var images = ['telephone.png', 'email.png', 'print.png', 'OS_Windows_8.png', 'OS_Ubuntu.png'];
                 for (var i = 0; i < images.length; i++) {
-                    var node = new JTopo.Node();
+                    var node = new Topo.Node();
                     node.setImage('/static/img/' + images[i]);
                     node.setSize(128, 128);
                     box.add(node);
 
-                    var link = new JTopo.Link(cNode, node);
+                    var link = new Topo.Link(cNode, node);
                     box.add(link);
                 }
 
@@ -514,18 +516,18 @@
 
             star: function star() {
 
-                var hostNode = new JTopo.Node();
+                var hostNode = new Topo.Node();
                 hostNode.setImage('/static/img/cloud.png');
                 hostNode.setSize(64, 64);
                 hostNode.setLocation(360, 190);
                 box.add(hostNode);
 
                 for (var i = 0; i < 8; i++) {
-                    var node = new JTopo.Node();
+                    var node = new Topo.Node();
                     node.setImage('/static/img/laptop.png');
                     node.setSize(64, 64);
                     box.add(node);
-                    box.add(new JTopo.Link(hostNode, node));
+                    box.add(new Topo.Link(hostNode, node));
                 }
 
                 hostNode.layout = { type: 'star', radius: 160 };
