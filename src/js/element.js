@@ -8,6 +8,10 @@ class Element {
         this.dragable = true
     }
 
+    draw() {
+
+    }
+
     getLocation(x, y) {
         return {x: this.x, y: this.y}
     }

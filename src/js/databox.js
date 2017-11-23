@@ -500,8 +500,12 @@ class DataBox {
         }
 
         for (var i = 0; i < this.nodes.length; i++) {
+            let node = this.nodes[i]
             if (this.nodes[i].x + this.nodes[i].width < 0 || this.nodes[i].x > box.canvas.width) continue
             this.nodes[i].draw(this.ctx)
+            if (node.isSelected() || node.isFocus()) {
+                node.drawSelectedRect(this.ctx)
+            }
         }
     }
 

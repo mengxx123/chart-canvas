@@ -48,9 +48,14 @@ class Node extends AbstractNode {
     }
 
     drawSelectedRect(ctx) {
+        ctx.save()
+        ctx.translate(this.x + this.width / 2, this.y + this.height / 2)
+        ctx.rotate(this.rotate)
+        ctx.scale(this.scala, this.scala)
+
+
         // let textWidth = ctx.measureText(this.getName()).width
         // let w = Math.max(this.width, textWidth)
-        ctx.save()
         ctx.beginPath()
 
         let strokeStyle = 'rgba(255, 0, 0, 0.9)'
@@ -59,9 +64,7 @@ class Node extends AbstractNode {
         }
 
         ctx.strokeStyle = strokeStyle
-        ctx.fillStyle = 'rgba(168,202,236,0.5)'
         ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height)
-        ctx.fill()
         ctx.stroke()
         ctx.closePath()
         ctx.restore()
@@ -89,10 +92,6 @@ class Node extends AbstractNode {
             ctx.closePath()
         }
         this.drawText(ctx)
-
-        if (this.isSelected() || this.isFocus()) {
-            this.drawSelectedRect(ctx)
-        }
 
         if (this.isTipVisible) {
             this.drawTip(ctx)
