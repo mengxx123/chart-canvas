@@ -52,7 +52,13 @@ class Node extends AbstractNode {
         // let w = Math.max(this.width, textWidth)
         ctx.save()
         ctx.beginPath()
-        ctx.strokeStyle = 'rgba(255, 0, 0, 0.9)'
+
+        let strokeStyle = 'rgba(255, 0, 0, 0.9)'
+        if (this.isSelected()) {
+            strokeStyle = '#09c'
+        }
+
+        ctx.strokeStyle = strokeStyle
         ctx.fillStyle = 'rgba(168,202,236,0.5)'
         ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height)
         ctx.fill()

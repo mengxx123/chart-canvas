@@ -241,40 +241,51 @@ class DataBox {
         var box = this
         var keyID = e.keyCode ? e.keyCode : e.which
         box.publish('keydown', keyID)
-        box.updateView()
-        return
+        // box.updateView()
 
-        if (keyID === 17) { // Ctrl
+        console.log(e.keyCode)
+
+        switch (keyID) {
+            case 8: // Backspace
+                this.remove(this.currElement)
+                box.updateView()
+                return false
+            case 27: // Esc
+                this.cancleAllSelected()
+                this.currElement = null
+                box.updateView()
+                return false
+            case 38: // up arrow and W
+            case 87:
+                if (this.currElement) {
+                    this.currElement.y -= 5
+                }
+                box.updateView()
+                return false
+            case 39: // right arrow and D
+            case 68:
+                if (this.currElement) {
+                    this.currElement.x += 5
+                }
+                box.updateView()
+                return false
+            case 40: // down arrow and S
+            case 83:
+                if (this.currElement) {
+                    this.currElement.y += 5
+                }
+                box.updateView()
+                return false
+            case 37: // left arrow and A
+            case 65:
+                if (this.currElement) {
+                    this.currElement.x -= 5
+                }
+                box.updateView()
+                return false
         }
-        if (keyID === 18) {// Alt
-        }
-        if (keyID === 16) { // Shift
-        }
-        if (keyID === 27) { // Esc
-            this.cancleAllSelected()
-            this.currElement = null
-        }
-        if (keyID === 38 || keyID === 87) { // up arrow and W
-            if (this.currElement) {
-                this.currElement.y -= 5
-            }
-        }
-        if (keyID === 39 || keyID === 68) { // right arrow and D
-            if (this.currElement) {
-                this.currElement.x += 5
-            }
-        }
-        if (keyID === 40 || keyID === 83) { // down arrow and S
-            if (this.currElement) {
-                this.currElement.y += 5
-            }
-        }
-        if (keyID === 37 || keyID === 65) { // left arrow and A
-            if (this.currElement) {
-                this.currElement.x -= 5
-            }
-        }
-        box.updateView()
+
+
     }
 
     keyup(e) {
