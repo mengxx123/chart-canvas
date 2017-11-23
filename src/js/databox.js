@@ -206,6 +206,7 @@ class DataBox {
                         || node.y > starty + height || node.y + node.height < starty
                 return !outOfSelectArea
             }
+            box.selectedElements = []
             for (var i = 0; i < box.nodes.length; i++) {
                 var node = box.nodes[i]
                 if (isInSelectArea(node)) {
@@ -247,8 +248,7 @@ class DataBox {
 
         switch (keyID) {
             case 8: // Backspace
-                this.remove(this.currElement)
-                box.updateView()
+                this.removeSelectedElement()
                 return false
             case 27: // Esc
                 this.cancleAllSelected()
@@ -257,35 +257,33 @@ class DataBox {
                 return false
             case 38: // up arrow and W
             case 87:
-                if (this.currElement) {
-                    this.currElement.y -= 5
-                }
+                this.dealSelectedElement(elem => {
+                    elem.y -= 5
+                })
                 box.updateView()
                 return false
             case 39: // right arrow and D
             case 68:
-                if (this.currElement) {
-                    this.currElement.x += 5
-                }
+                this.dealSelectedElement(elem => {
+                    elem.x += 5
+                })
                 box.updateView()
                 return false
             case 40: // down arrow and S
             case 83:
-                if (this.currElement) {
-                    this.currElement.y += 5
-                }
+                this.dealSelectedElement(elem => {
+                    elem.y += 5
+                })
                 box.updateView()
                 return false
             case 37: // left arrow and A
             case 65:
-                if (this.currElement) {
-                    this.currElement.x -= 5
-                }
+                this.dealSelectedElement(elem => {
+                    elem.x -= 5
+                })
                 box.updateView()
                 return false
         }
-
-
     }
 
     keyup(e) {
@@ -314,12 +312,30 @@ class DataBox {
         }
     }
 
-    remove(e) {
-        this.elements = this.elements.del(e)
-        this.containers = this.containers.del(e)
-        this.links = this.links.del(e)
-        this.nodes = this.nodes.del(e)
-        this.elementMap[e.id] = e
+    remove(element) {
+        this.elements = this.elements.del(element)
+        this.containers = this.containers.del(element)
+        this.links = this.links.del(element)
+        this.nodes = this.nodes.del(element)
+        this.elementMap[element.id] = element
+    }
+
+    // 移除所有选中的元素
+    removeSelectedElement() {
+        let _this = this
+        for (let elem of this.selectedElements) {
+            _this.remove(elem)
+        }
+        this.selectedElement = null
+        this.selectedElements = []
+        this.updateView()
+    }
+
+    dealSelectedElement(callback) {
+        console.log('length' + this.selectedElements.length)
+        this.selectedElements.forEach(item => {
+            callback(item)
+        })
     }
 
     addElement(e) {

@@ -61,6 +61,7 @@
                 <button @click="container">container</button>
                 <button @click="container1">container1</button>
                 <button @click="clear">清空</button>
+                <button @click="remove">删除</button>
                 <hr>
                 随机生成1万个节点、5000条连线：
                 <button @click="testing">性能测试（100节点）</button>
@@ -183,6 +184,9 @@
 
                 var time = new Date().getTime() - start;
                 console.log(time + 'ms');
+            },
+            remove() {
+                this.box.removeSelectedElement()
             },
             clear: function clear() {
                 this.box.clear()
