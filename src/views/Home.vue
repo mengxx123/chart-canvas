@@ -1,31 +1,5 @@
 <template>
-    <div class="hello">
-        <header class="layout-header navbar navbar-light">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse"
-                            data-target="#navbar-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="/"><h1>拓扑图</h1></a>
-                </div>
-                <div id="navbar-collapse" class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav" id="menu-layoutit">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/" target="_blank">首页</a>
-                        </li>
-                    </ul>
-                    <ul class="nav navbar-nav pull-right">
-                        <!--<li class="nav-item">
-                            <a class="nav-link" href="http://yunser.com/8.html" target="_blank">留言</a>
-                        </li>-->
-                    </ul>
-
-                </div>
-            </div>
-        </header>
+    <my-page title="拓扑图" :padding="false">
         <div class="layout-tool">
             <div>
                 <label><input type="radio" name="type">默认</label>
@@ -77,7 +51,7 @@
 
             </div>
         </div>
-    </div>
+    </my-page>
 </template>
 
 <script>
