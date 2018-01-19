@@ -2,7 +2,6 @@
 # Fucksvg 
 
 A lightly Topological graph.
-一个轻量的拓扑图开源库。
 
 ## doc
 

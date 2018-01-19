@@ -1,5 +1,8 @@
 <template>
-    <my-page title="拓扑图" :padding="false">
+    <div :padding="false">
+        <ui-appbar title="拓扑图">
+            <ui-icon-button icon="menu" slot="left"/>
+        </ui-appbar>
         <div class="layout-tool">
             <div>
                 <label><input type="radio" name="type">默认</label>
@@ -13,11 +16,11 @@
                     <input type="checkbox">鼠标缩放</label>
 
                 <input v-model="keyword">
-                <button @click="search">查询</button>
+                <ui-raised-button class="btn" label="查询" @click="search"/>
                 <button>旋转克隆</button>
-                <button>导出 PNG</button>
                 <button>导出 PDF</button>
-
+                <ui-raised-button class="btn" label="导出 PNG" @click="downloadPng"/>
+                <ui-raised-button class="btn" label="添加用例" @click="addCase"/>
             </div>
         </div>
         <div class="layout-body">
@@ -51,7 +54,7 @@
 
             </div>
         </div>
-    </my-page>
+    </div>
 </template>
 
 <script>
@@ -66,72 +69,85 @@
         },
         mounted() {
             var box = new DataBox('dataBox', $("#canvas")[0]);
-            box.isShowRange = false;
             this.box = box
-            //box.viewbox()
-            //box.setBg('');
+            this.box.isShowRange = false;
+            this.box.image = null
+//            //box.viewbox()
+//            //box.setBg('');
+//
+//            var node = new Topo.Node('Hello world!');
+//            node.setLocation(0, 0);
+//            box.add(node);
+//
+//            var defaultNode = new Topo.Node('Node');
+//            defaultNode.setLocation(200, 100);
+//            defaultNode.rotate = Math.PI/10;
+//            box.add(defaultNode);
+//
+//            var tipNode = new Topo.TipNode('a tip.');
+//            tipNode.setLocation(540, 100);
+//            box.add(tipNode);
+//
+//            var textNode = new Topo.TextNode('This is a Text node.');
+//            textNode.setLocation(317, 310);
+//            box.add(textNode);
+//
+//            var peopleNode = new Topo.Node('people');
+//            peopleNode.setLocation(500, 200);
+//            peopleNode.setSize(64, 64);
+//            peopleNode.setImage('/static/img/person.png');
+//            box.add(peopleNode);
+//
+//            var circleNode = new Topo.CircleNode()
+//            circleNode.style.fillStyle = '0, 0, 255';
+//            circleNode.setLocation(390, 90);
+//            box.add(circleNode);
+//
+//            var heartNode = new Topo.HeartNode();
+//            heartNode.style.fillStyle = '255, 0, 0';
+//            heartNode.setLocation(300, 170);
+//            box.add(heartNode);
+//
+//            var group = new Topo.GhomboidContainer("vmgroup");
+//            group.style = {fillStyle: '0, 0, 100'};
+//            group.add(circleNode);
+//            group.add(heartNode);
+//
 
-            var node = new Topo.Node('Hello world!');
-            node.setLocation(0, 0);
-            box.add(node);
-
-            var defaultNode = new Topo.Node('Node');
-            defaultNode.setLocation(200, 100);
-            defaultNode.rotate = Math.PI/10;
-            box.add(defaultNode);
-
-            var tipNode = new Topo.TipNode('a tip.');
-            tipNode.setLocation(540, 100);
-            box.add(tipNode);
-
-            var textNode = new Topo.TextNode('This is a Text node.');
-            textNode.setLocation(317, 310);
-            box.add(textNode);
-
-            var peopleNode = new Topo.Node('people');
-            peopleNode.setLocation(500, 200);
-            peopleNode.setSize(64, 64);
-            peopleNode.setImage('/static/img/person.png');
-            box.add(peopleNode);
-
-            var circleNode = new Topo.CircleNode()
-            circleNode.style.fillStyle = '0, 0, 255';
-            circleNode.setLocation(390, 90);
-            box.add(circleNode);
-
-            var heartNode = new Topo.HeartNode();
-            heartNode.style.fillStyle = '255, 0, 0';
-            heartNode.setLocation(300, 170);
-            box.add(heartNode);
-
-            var group = new Topo.GhomboidContainer("vmgroup");
-            group.style = {fillStyle: '0, 0, 100'};
-            group.add(circleNode);
-            group.add(heartNode);
-
-            var hostNode = new Topo.Node();
-            hostNode.setImage('/static/img/cloud.png');
-            hostNode.setSize(64, 64);
-            hostNode.setLocation(360,190);
-            box.add(hostNode);
-
-            for (var i = 0; i < 8; i++) {
-                var node = new Topo.Node();
-                node.setImage('/static/img/laptop.png');
-                node.setSize(64, 64);
-                box.add(node);
-                box.add(new Topo.Link(hostNode, node));
-            }
-
-            hostNode.layout = {type: 'star', radius:160};
-            box.layoutNode(hostNode);
+//
+//            hostNode.layout = {type: 'star', radius:160};
+//            box.layoutNode(hostNode);
 
             /*group.add(node1);
              group.add(node2);*/
 
+            this.init()
+            this.addCase()
             box.updateView();
         },
         methods: {
+            init() {
+            },
+            downloadPng() {
+                console.log(this.box.canvas)
+                this.box.canvas.toBlob(function (blob) {
+                    saveAs(blob, "pretty image.png")
+                })
+            },
+            addCase() {
+                var hostNode = new Topo.Node();
+                hostNode.setImage('/static/img/cloud.png');
+                hostNode.setSize(64, 64);
+                hostNode.setLocation(360,190);
+                this.box.add(hostNode);
+
+                var node = new Topo.Node();
+                node.setImage('/static/img/laptop.png');
+                node.setSize(64, 64);
+                node.setLocation(200, 100)
+                this.box.add(node);
+                this.box.add(new Topo.Link(hostNode, node));
+            },
             search() {
                 this.box.search(this.keyword)
             },
