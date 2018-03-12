@@ -81,7 +81,13 @@
             this.box = box
             this.box.isShowRange = false;
             this.box.image = null
-            // this.setMode('round')
+            this.setMode('round')
+
+            var node = new Topo.Circle()
+            node.r = 100
+            node.setLocation(0, 0)
+            this.box.add(node)
+
             this.box.subscribe('mousemove', e => {
                 console.log('啦啦')
                 console.log(e)
@@ -145,6 +151,7 @@
         },
         methods: {
             init() {
+
             },
             setMode(mode) {
                 this.box.mode = mode

@@ -189,14 +189,17 @@ class DataBox {
     onRoundMousemove(x, y) {
         if (this.isOnMouseDown) {
             this.updateView()
-            this.ctx.fillStyle = '#f00'
             let minX = Math.min(x, this.startDragMouseX)
             let minY = Math.min(y, this.startDragMouseY)
-            this.ctx.fillRect(minX, minY, 
-                Math.abs(x - this.startDragMouseX), Math.abs(y - this.startDragMouseY))
+            let radius = Math.sqrt(Math.pow(x - this.startDragMouseX, 2) + Math.pow(y - this.startDragMouseY, 2))
+            
+            this.ctx.fillStyle = '#f00'
+            this.ctx.beginPath()
+            this.ctx.arc(this.startDragMouseX, this.startDragMouseY, radius, 0, 2 * Math.PI)
+            this.ctx.fill()
         }
     }
-
+    
     mousemove(event) {
         var box = this
         var xy = util.getXY(box, event)
@@ -283,6 +286,16 @@ class DataBox {
         this.mode = 'common'
     }
 
+    onRoundMouseup(x, y) {
+        let radius = Math.sqrt(Math.pow(x - this.startDragMouseX, 2) + Math.pow(y - this.startDragMouseY, 2))
+        var node = new Topo.Circle()
+        node.r = radius
+        node.setLocation(this.startDragMouseX - radius, this.startDragMouseY - radius)
+        this.add(node)
+        this.updateView()
+        this.mode = 'common'
+    }
+
     mouseup(event) {
         var box = this
         var xy = util.getXY(this, event)
@@ -303,6 +316,10 @@ class DataBox {
 
         if (this.mode === 'rect') {
             this.onRectMouseup(xy.x, xy.y)
+            return
+        }
+        if (this.mode === 'round') {
+            this.onRoundMouseup(xy.x, xy.y)
             return
         }
     }
