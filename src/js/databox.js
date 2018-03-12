@@ -26,10 +26,10 @@ class DataBox {
     }
 
     init() {
-        this.ctx.shadowBlur = 5
-        this.ctx.shadowColor = 'rgba(0,0,0,0.5)'
-        this.ctx.shadowOffsetX = 3
-        this.ctx.shadowOffsetY = 6
+        // this.ctx.shadowBlur = 5
+        // this.ctx.shadowColor = 'rgba(0,0,0,0.5)'
+        // this.ctx.shadowOffsetX = 3
+        // this.ctx.shadowOffsetY = 6
 
         this.startDragMouseX = 0
         this.startDragMouseY = 0
@@ -176,6 +176,10 @@ class DataBox {
         box.publish('mousedown', {target: box.currElement, x: x, y: y, context: box})
     }
 
+    onRectMousemove(dx, dy) {
+        console.log(1, 2)
+    }
+
     mousemove(event) {
         var box = this
         var xy = util.getXY(box, event)
@@ -183,7 +187,14 @@ class DataBox {
         var y = xy.y
         var dx = (x - box.startDragMouseX)
         var dy = (y - box.startDragMouseY)
+        console.log(dx, dy)
         box.publish('mousemove', {target: box.currElement, x: x, y: y, dx: dx, dy: dy, context: box})
+
+        this.mode = 'rect' // TODO 写死
+        if (this.mode === 'rect') {
+            this.onRectMousemove(dx, dy)
+            return
+        }
 
         //if(box.currElement && !box.currElement.isDragable()) return
 

@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import Home from '@/views/Home'
-import About from '@/views/About'
+const Home = resolve => require(['@/views/Home'], resolve)
+const Help = resolve => require(['@/views/Help'], resolve)
+const About = resolve => require(['@/views/About'], resolve)
 
 Vue.use(Router)
 
@@ -12,6 +13,10 @@ export default new Router({
         {
             path: '/',
             component: Home
+        },
+        {
+            path: '/help',
+            component: Help
         },
         {
             path: '/about',

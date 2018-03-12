@@ -5,15 +5,15 @@
         </ui-appbar>
         <div class="layout-tool">
             <div>
-                <label><input type="radio" name="type">默认</label>
-                <label><input type="radio" name="type">框选</label>
-                <label><input type="radio" name="type">加线</label>
-                <button>居中显示</button>
-                <button>全屏显示</button>
-                <button>放大</button>
-                <button>缩小</button>
-                <label>
-                    <input type="checkbox">鼠标缩放</label>
+                <!-- <label><input type="radio" name="type">默认</label> -->
+                <!-- <label><input type="radio" name="type">框选</label> -->
+                <!-- <label><input type="radio" name="type">加线</label> -->
+                <!-- <button>居中显示</button> -->
+                <!-- <button>全屏显示</button> -->
+                <!-- <button>放大</button> -->
+                <!-- <button>缩小</button> -->
+                <!-- <label>
+                    <input type="checkbox">鼠标缩放</label> -->
 
                 <input v-model="keyword">
                 <ui-raised-button class="btn" label="查询" @click="search"/>
@@ -21,6 +21,8 @@
                 <button>导出 PDF</button>
                 <ui-raised-button class="btn" label="导出 PNG" @click="downloadPng"/>
                 <ui-raised-button class="btn" label="添加用例" @click="addCase"/>
+                <ui-raised-button class="btn" label="帮助" to="/help" target="_blank"/>
+                <ui-raised-button class="btn" label="画矩形" @click="rect" />
             </div>
         </div>
         <div class="layout-body">
@@ -46,6 +48,7 @@
 
                 <button @click="exportJson">导出 JSON</button>
                 <button @click="loadJson">加载 JSON</button>
+                <div>（{{ curPosition.x }}，{{ curPosition.y }}）</div>
                 <code>
             <pre>{
     []
@@ -64,7 +67,11 @@
     export default {
         data() {
             return {
-                keyword: ''
+                keyword: '',
+                curPosition: {
+                    x: 0,
+                    y: 0
+                }
             }
         },
         mounted() {
@@ -72,6 +79,15 @@
             this.box = box
             this.box.isShowRange = false;
             this.box.image = null
+
+            this.box.subscribe('mousemove', e => {
+                console.log('啦啦')
+                console.log(e)
+                this.curPosition = {
+                    x: e.dx,
+                    y: e.dy
+                }
+            })
 //            //box.viewbox()
 //            //box.setBg('');
 //
@@ -127,6 +143,12 @@
         },
         methods: {
             init() {
+            },
+            rect() {
+                var hostNode = new Topo.Rect()
+                hostNode.setSize(64, 64);
+                hostNode.setLocation(360,190);
+                this.box.add(hostNode);
             },
             downloadPng() {
                 console.log(this.box.canvas)

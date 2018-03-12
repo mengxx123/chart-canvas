@@ -6,6 +6,9 @@
                 <ui-list-item title="首页" to="/">
                     <ui-icon value="home" slot="left" />
                 </ui-list-item>
+                <ui-list-item title="帮助" to="/help">
+                    <ui-icon value="home" slot="left" />
+                </ui-list-item>
             </ui-list>
             <ui-list class="ui-position-bottom" @itemClick="toggle()">
                 <ui-list-item title="关于" to="/about">
