@@ -17,14 +17,15 @@
 
                 <input v-model="keyword">
                 <ui-raised-button class="btn" label="查询" @click="search"/>
-                <button>旋转克隆</button>
-                <button>导出 PDF</button>
+                <!-- <button>旋转克隆</button> -->
+                <!-- <button>导出 PDF</button> -->
                 <ui-raised-button class="btn" label="导出 PNG" @click="downloadPng"/>
                 <ui-raised-button class="btn" label="添加用例" @click="addCase"/>
                 <ui-raised-button class="btn" label="帮助" to="/help" target="_blank"/>
                 <ui-raised-button class="btn" label="选择工具" @click="setMode('select')" />
                 <ui-raised-button class="btn" label="画矩形" @click="setMode('rect')" />
                 <ui-raised-button class="btn" label="画圆" @click="setMode('round')" />
+                <ui-raised-button class="btn" label="画直线" @click="setMode('line')" />
             </div>
         </div>
         <div class="layout-body">
@@ -81,7 +82,7 @@
             this.box = box
             this.box.isShowRange = false;
             this.box.image = null
-            this.setMode('rect')
+            this.setMode('line')
 
             var node = new Topo.Circle()
             node.r = 100

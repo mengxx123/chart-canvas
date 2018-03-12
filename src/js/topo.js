@@ -3,7 +3,7 @@ import Element from './element'
 import AbstractNode from './abstractnode'
 import {Node, CircleNode, GhomboidNode, TipNode, TextNode, HeartNode, UMLClassNode, EndPointNode} from './node'
 import {Container, GridContainer, OneItemContainer, GhomboidContainer} from './container'
-import {Rect, Circle} from './rect'
+import {Rect, Circle, Line} from './rect'
 import {Link, FoldLink, CurveLink, ArrowsLink, ArrowsFoldLink} from './link'
 
 var Topo = {
@@ -15,6 +15,7 @@ var Topo = {
     ArrowsFoldLink: ArrowsFoldLink,
     Circle: Circle,
     Rect: Rect,
+    Line: Line,
     DataBox: DataBox,
     Element: Element,
     AbstractNode: AbstractNode,

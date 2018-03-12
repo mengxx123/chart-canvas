@@ -37,7 +37,7 @@ class Rect extends Node {
     }
 
     draw(ctx) {
-        if (this.visible == false) {
+        if (this.visible === false) {
             return
         }
 
@@ -46,4 +46,23 @@ class Rect extends Node {
     }
 }
 
-export {Circle, Rect}
+class Line extends Node {
+    constructor(name) {
+        super(name)
+    }
+
+    draw(ctx) {
+        if (this.visible === false) {
+            return
+        }
+
+        ctx.lineWidth = 1
+        ctx.strokeStyle = 'rgba(' + this.style.fillStyle + ',' + this.alpha + ')'
+        ctx.beginPath()
+        ctx.moveTo(this.x, this.y)
+        ctx.lineTo(this.x2, this.y2)
+        ctx.stroke()
+    }
+}
+
+export {Circle, Rect, Line}
