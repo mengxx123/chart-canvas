@@ -81,7 +81,7 @@
             this.box = box
             this.box.isShowRange = false;
             this.box.image = null
-            this.setMode('round')
+            this.setMode('rect')
 
             var node = new Topo.Circle()
             node.r = 100
@@ -89,8 +89,6 @@
             this.box.add(node)
 
             this.box.subscribe('mousemove', e => {
-                console.log('啦啦')
-                console.log(e)
                 this.curPosition = {
                     x: e.dx,
                     y: e.dy
@@ -163,7 +161,6 @@
                 this.box.add(hostNode);
             },
             downloadPng() {
-                console.log(this.box.canvas)
                 this.box.canvas.toBlob(function (blob) {
                     saveAs(blob, "pretty image.png")
                 })
