@@ -1,5 +1,5 @@
 import AbstractNode from './abstractnode'
-
+/* eslint-disable */
 class Node extends AbstractNode {
     constructor(name) {
         super()

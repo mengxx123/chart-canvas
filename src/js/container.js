@@ -1,5 +1,5 @@
 import Element from './element'
-
+/* eslint-disable */
 class Container extends Element {
     
     constructor(name) {

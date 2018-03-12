@@ -2,7 +2,7 @@
  * Topo (17.6.1) element.js
  * Licensed under MIT
  */
-
+/* eslint-disable */
 import {Container} from './container'
 import {Link} from './link'
 import {Node} from './node'
@@ -138,16 +138,24 @@ class DataBox {
             box.isMousedown = false
             box.mouseup(event)
         }
-        window.addEventListener('keydown', function (e) {
+        window.addEventListener('keydown', this.onKeydown = function (e) {
             box.keydown(e)
         }, true)
-        window.addEventListener('keyup', function (e) {
+        window.addEventListener('keyup', this.onKeyup = function (e) {
             box.keyup(e)
         }, true)
 
         setTimeout(function () {
             box.updateView()
         }, 300)
+    }
+
+    destroy() {
+        this.canvas.onmousedown = null
+        this.canvas.onmousemove = null
+        this.canvas.onmouseup = null
+        window.removeEventListener('keydown', this.onKeydown)
+        window.addEventListener('keyup', this.onKeyup)
     }
 
     getElementByXY(x, y) {
@@ -365,7 +373,7 @@ class DataBox {
         var keyID = e.keyCode ? e.keyCode : e.which
         box.publish('keydown', keyID)
         // box.updateView()
-
+        let grid = 4
         switch (keyID) {
             case 8: // Backspace
                 this.removeSelectedElement()
@@ -377,30 +385,59 @@ class DataBox {
                 return false
             case 38: // up arrow and W
             case 87:
-                this.dealSelectedElement(elem => {
-                    elem.y -= 5
-                })
+                if (e.ctrlKey) {
+                    this.dealSelectedElement(elem => {
+                        if (elem.height > grid) {
+                            elem.height -= grid
+                        }
+                    })
+                } else {
+                    this.dealSelectedElement(elem => {
+                        elem.y -= grid
+                    })
+                }
                 box.updateView()
                 return false
             case 39: // right arrow and D
             case 68:
-                this.dealSelectedElement(elem => {
-                    elem.x += 5
-                })
-                box.updateView()
+                if (e.ctrlKey) {
+                    this.dealSelectedElement(elem => {
+                        elem.width += grid
+                    })
+                    box.updateView()
+                } else {
+                    this.dealSelectedElement(elem => {
+                        elem.x += grid
+                    })
+                    box.updateView()
+                }
                 return false
             case 40: // down arrow and S
             case 83:
-                this.dealSelectedElement(elem => {
-                    elem.y += 5
-                })
+                if (e.ctrlKey) {
+                    this.dealSelectedElement(elem => {
+                        elem.height += grid
+                    })
+                } else {
+                    this.dealSelectedElement(elem => {
+                        elem.y += grid
+                    })
+                }
                 box.updateView()
                 return false
             case 37: // left arrow and A
             case 65:
-                this.dealSelectedElement(elem => {
-                    elem.x -= 5
-                })
+                if (e.ctrlKey) {
+                    this.dealSelectedElement(elem => {
+                        if (elem.width > grid) {
+                            elem.width -= grid
+                        }
+                    })
+                } else {
+                    this.dealSelectedElement(elem => {
+                        elem.x -= grid
+                    })
+                }
                 box.updateView()
                 return false
             case 17:

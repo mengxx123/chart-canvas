@@ -2,7 +2,7 @@
  * Topo (17.6.1) element.js
  * Licensed under MIT
  */
-
+/* eslint-disable */
 import Element from './element'
 
 class AbstractNode extends Element {

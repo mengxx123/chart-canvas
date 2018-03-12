@@ -64,6 +64,7 @@
 </template>
 
 <script>
+    /* eslint-disable */
     import '@/js/main'
     import DataBox from '@/js/databox'
     
@@ -147,6 +148,9 @@
             this.init()
             this.addCase()
             box.updateView();
+        },
+        destroyed() {
+            this.box.destroy()
         },
         methods: {
             init() {

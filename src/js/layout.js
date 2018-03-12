@@ -1,3 +1,4 @@
+/* eslint-disable */
 function getStarPositions(x, y, count, radius, beginDegree, endDegree){
     var start = beginDegree ? beginDegree : 0;
     var end = endDegree ? endDegree : 2*Math.PI;

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import DataBox from './databox'
 import Element from './element'
 import AbstractNode from './abstractnode'

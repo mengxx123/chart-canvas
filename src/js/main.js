@@ -9,5 +9,3 @@ import './link'
 import './node'
 import './util'
 import './index'
-
-console.log('呵呵哒')

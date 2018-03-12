@@ -1,3 +1,4 @@
+/* eslint-disable */
 function MessageBus(name){
     var _self = this
     this.name = name

@@ -1,5 +1,5 @@
 import Element from './element'
-
+/* eslint-disable */
 class Link extends Element {
     constructor(nodeA, nodeB) {
         super()
