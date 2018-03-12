@@ -22,7 +22,9 @@
                 <ui-raised-button class="btn" label="导出 PNG" @click="downloadPng"/>
                 <ui-raised-button class="btn" label="添加用例" @click="addCase"/>
                 <ui-raised-button class="btn" label="帮助" to="/help" target="_blank"/>
-                <ui-raised-button class="btn" label="画矩形" @click="rect" />
+                <ui-raised-button class="btn" label="选择工具" @click="setMode('select')" />
+                <ui-raised-button class="btn" label="画矩形" @click="setMode('rect')" />
+                <ui-raised-button class="btn" label="画圆" @click="setMode('round')" />
             </div>
         </div>
         <div class="layout-body">
@@ -79,7 +81,7 @@
             this.box = box
             this.box.isShowRange = false;
             this.box.image = null
-
+            // this.setMode('round')
             this.box.subscribe('mousemove', e => {
                 console.log('啦啦')
                 console.log(e)
@@ -144,10 +146,13 @@
         methods: {
             init() {
             },
+            setMode(mode) {
+                this.box.mode = mode
+            },
             rect() {
                 var hostNode = new Topo.Rect()
-                hostNode.setSize(64, 64);
-                hostNode.setLocation(360,190);
+                hostNode.setSize(64, 64)
+                hostNode.setLocation(0, 0)
                 this.box.add(hostNode);
             },
             downloadPng() {

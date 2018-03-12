@@ -90,7 +90,6 @@ class DataBox {
 
     // 搜索，并选中匹配的元素 TODO 定位匹配的元素
     search(keyword) {
-        console.log('搜索')
         this.cancleAllSelected()
         for (let i = 0; i < this.nodes.length; i++) {
             let node = this.nodes[i]
@@ -176,8 +175,26 @@ class DataBox {
         box.publish('mousedown', {target: box.currElement, x: x, y: y, context: box})
     }
 
-    onRectMousemove(dx, dy) {
-        console.log(1, 2)
+    onRectMousemove(x, y) {
+        if (this.isOnMouseDown) {
+            this.updateView()
+            this.ctx.fillStyle = '#f00'
+            let minX = Math.min(x, this.startDragMouseX)
+            let minY = Math.min(y, this.startDragMouseY)
+            this.ctx.fillRect(minX, minY, 
+                Math.abs(x - this.startDragMouseX), Math.abs(y - this.startDragMouseY))
+        }
+    }
+
+    onRoundMousemove(x, y) {
+        if (this.isOnMouseDown) {
+            this.updateView()
+            this.ctx.fillStyle = '#f00'
+            let minX = Math.min(x, this.startDragMouseX)
+            let minY = Math.min(y, this.startDragMouseY)
+            this.ctx.fillRect(minX, minY, 
+                Math.abs(x - this.startDragMouseX), Math.abs(y - this.startDragMouseY))
+        }
     }
 
     mousemove(event) {
@@ -187,12 +204,14 @@ class DataBox {
         var y = xy.y
         var dx = (x - box.startDragMouseX)
         var dy = (y - box.startDragMouseY)
-        console.log(dx, dy)
         box.publish('mousemove', {target: box.currElement, x: x, y: y, dx: dx, dy: dy, context: box})
 
-        this.mode = 'rect' // TODO 写死
-        if (this.mode === 'rect') {
-            this.onRectMousemove(dx, dy)
+        if (box.mode === 'rect') {
+            box.onRectMousemove(xy.x, xy.y)
+            return
+        }
+        if (box.mode === 'round') {
+            box.onRoundMousemove(xy.x, xy.y)
             return
         }
 
@@ -250,6 +269,20 @@ class DataBox {
         }
     }
 
+    onRectMouseup(x, y) {
+        let minX = Math.min(x, this.startDragMouseX)
+        let minY = Math.min(y, this.startDragMouseY)
+        let width = Math.abs(x - this.startDragMouseX)
+        let height = Math.abs(y - this.startDragMouseY)
+        var hostNode = new Topo.Rect()
+        hostNode.setSize(width, height)
+        hostNode.setLocation(minX, minY)
+        this.add(hostNode)
+        this.updateView()
+        console.log(x, this.startDragMouseX)
+        this.mode = 'common'
+    }
+
     mouseup(event) {
         var box = this
         var xy = util.getXY(this, event)
@@ -259,7 +292,7 @@ class DataBox {
         var dy = (y - box.startDragMouseY)
 
         box.publish('mouseup', {target: box.currElement, x: x, y: y, dx: dx, dy: dy, context: box})
-        box.startDragMouseX = null
+        // box.startDragMouseX = null
 
         if (box.currElement) {
             box.currElement.onMouseup({x: x, y: y, context: box, dx: dx, dy: dy})
@@ -267,6 +300,11 @@ class DataBox {
 
         box.updateView()
         box.isOnMouseDown = false
+
+        if (this.mode === 'rect') {
+            this.onRectMouseup(xy.x, xy.y)
+            return
+        }
     }
 
     keydown(e) {
@@ -274,8 +312,6 @@ class DataBox {
         var keyID = e.keyCode ? e.keyCode : e.which
         box.publish('keydown', keyID)
         // box.updateView()
-
-        console.log(e.keyCode)
 
         switch (keyID) {
             case 8: // Backspace
@@ -371,7 +407,6 @@ class DataBox {
     }
 
     dealSelectedElement(callback) {
-        console.log('length' + this.selectedElements.length)
         this.selectedElements.forEach(item => {
             callback(item)
         })
