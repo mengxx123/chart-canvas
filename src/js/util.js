@@ -98,11 +98,16 @@ function mouseCoords(event){
     }
 }
 
-function getXY(box, event){
-    event = event || mouseCoords(window.event)
-    var x = document.body.scrollLeft + (event.x || event.layerX)
-    var y = document.body.scrollTop + (event.y || event.layerY) 
-    return {x: x-box.offset.left, y: y-box.offset.top}
+function getXY(box, e) {
+    let rect = box.canvas.getBoundingClientRect()
+    return {
+        x: e.pageX - rect.left,
+        y: e.pageY - rect.top
+    }
+    // event = event || mouseCoords(window.event)
+    // var x = document.body.scrollLeft + (event.x || event.layerX)
+    // var y = document.body.scrollTop + (event.y || event.layerY) 
+    // return {x: x-box.offset.left, y: y-box.offset.top}
 }
 
 function rotatePoint(bx, by, x, y, angle){

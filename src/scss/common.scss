@@ -30,11 +30,12 @@ canvas {
 }
 .layout-tool {
     position: absolute;
-    top: 52px;
+    top: 0;
     right: 0;
     left: 0;
-    height: 64px;
-    padding: 8px;
+    height: 48px;
+    // padding: 8px;
+    background-color: #fff;
     border-bottom: 1px solid #ccc;
 }
 .layout-body {
@@ -46,17 +47,36 @@ canvas {
 }
 .layout-content {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 48px;
+    left: 16px;
     right: 320px;
     bottom: 0;
     border-right: 1px solid #ccc;
 }
-.layout-side {
-    position: absolute;
-    top: 0;
-    right: 0;
+/**/
+.attr-box {
     width: 320px;
+    .body {
+        padding: 16px;
+    }
+}
+/**/
+.template-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     bottom: 0;
-    background-color: #eee;
+    background-color: #fff;
+}
+/**/
+.empty-box {
+    padding-top: 80px;
+    text-align: center;
+    .img {
+        width: 120px;
+    }
+    .text {
+        color: #999;
+    }
 }

@@ -1,8 +1,5 @@
 <template>
-    <div :padding="false">
-        <ui-appbar title="拓扑图">
-            <ui-icon-button icon="menu" slot="left"/>
-        </ui-appbar>
+    <my-page title="拓扑图">
         <div class="layout-tool">
             <div>
                 <!-- <label><input type="radio" name="type">默认</label> -->
@@ -15,52 +12,81 @@
                 <!-- <label>
                     <input type="checkbox">鼠标缩放</label> -->
 
-                <input v-model="keyword">
-                <ui-raised-button class="btn" label="查询" @click="search"/>
+                <!-- <input v-model="keyword"> -->
+                <!-- <ui-raised-button class="btn" label="查询" @click="search"/> -->
                 <!-- <button>旋转克隆</button> -->
                 <!-- <button>导出 PDF</button> -->
                 <ui-raised-button class="btn" label="导出 PNG" @click="downloadPng"/>
-                <ui-raised-button class="btn" label="添加用例" @click="addCase"/>
+                <!-- <ui-raised-button class="btn" label="添加用例" @click="addCase"/> -->
                 <ui-raised-button class="btn" label="帮助" to="/help" target="_blank"/>
                 <ui-raised-button class="btn" label="选择工具" @click="setMode('select')" />
                 <ui-raised-button class="btn" label="画矩形" @click="setMode('rect')" />
                 <ui-raised-button class="btn" label="画圆" @click="setMode('round')" />
                 <ui-raised-button class="btn" label="画直线" @click="setMode('line')" />
+                <ui-raised-button class="btn" label="清空" @click="clear" />
+                <ui-raised-button class="btn" label="选择模板" @click="templateBoxVisible = true" />
+                <ui-raised-button class="btn" label="显示属性面板" @click="attrBoxVisible = true" />
+                
             </div>
         </div>
-        <div class="layout-body">
-            <div class="layout-content">
-                <canvas id="canvas" style="" width="800" height="500"></canvas>
-            </div>
-            <div id="app" class="layout-side">
-                <button @click="node">Mode</button>
-                <button @click="star">star</button>
-                <button @click="star2">star2</button>
-                <button @click="link">link</button>
-                <button @click="uml">UML</button>
-                <button @click="tree">tree</button>
-                <button @click="device">device</button>
-                <button @click="container">container</button>
-                <button @click="container1">container1</button>
-                <button @click="clear">清空</button>
-                <button @click="remove">删除</button>
-                <hr>
-                随机生成1万个节点、5000条连线：
-                <button @click="testing">性能测试（100节点）</button>
-                用时：0.656 秒.
+        <div class="layout-content">
+            <canvas id="canvas" style="" width="800" height="500"></canvas>
+        </div>
+        <div id="app" class="layout-side">
+            <!-- <button @click="node">Mode</button> -->
+            <!-- <button @click="star">star</button> -->
+            <!-- <button @click="star2">star2</button> -->
+            <!-- <button @click="link">link</button> -->
+            <!-- <button @click="uml">UML</button> -->
+            <!-- <button @click="tree">tree</button> -->
+            <!-- <button @click="device">device</button> -->
+            <!-- <button @click="container">container</button> -->
+            <!-- <button @click="container1">container1</button> -->
+            
+            <!-- <hr>
+            随机生成1万个节点、5000条连线：
+            <button @click="testing">性能测试（100节点）</button>
+            用时：0.656 秒.
 
-                <button @click="exportJson">导出 JSON</button>
-                <button @click="loadJson">加载 JSON</button>
-                <div>（{{ curPosition.x }}，{{ curPosition.y }}）</div>
-                <code>
-            <pre>{
-    []
+            <button @click="exportJson">导出 JSON</button>
+            <button @click="loadJson">加载 JSON</button>
+            
+            <code>
+        <pre>{
+[]
 }</pre>
-                </code>
+            </code> -->
 
+        </div>
+        <ui-drawer class="attr-box" :open="attrBoxVisible" right>
+            <ui-appbar title="属性设置">
+                <ui-icon-button icon="close" slot="left" @click="attrBoxVisible = false" />
+            </ui-appbar>
+            <div class="body">
+                <div>（{{ curPosition.x }}，{{ curPosition.y }}）</div>
+                <div v-if="currElement">
+                    <ui-raised-button class="btn" label="添加子节点" @click="addChildNode" />
+                    <ui-raised-button class="btn" label="删除节点" @click="remove" />
+                    <ui-text-field v-model="currElement.name" label="节点名称" />
+                    <!-- <ui-text-field v-model.number="currElement.alpha" label="不透明度" /> -->
+                    <!-- <ui-text-field v-model.number="currElement.width" label="宽度" /> -->
+                    <!-- {{ currElement }} -->
+                </div>
+                <div v-else>
+                    请选择节点进行编辑
+                </div>
+            </div>
+        </ui-drawer>
+        <div class="template-box" v-if="templateBoxVisible">
+            <ui-appbar title="模板">
+                <ui-icon-button icon="close" slot="left" @click="templateBoxVisible = false" />
+            </ui-appbar> 
+            <div class="empty-box">
+                <img class="img" src="/static/img/empty.svg">
+                <div class="text">暂无模板</div>
             </div>
         </div>
-    </div>
+    </my-page>
 </template>
 
 <script>
@@ -75,27 +101,31 @@
                 curPosition: {
                     x: 0,
                     y: 0
-                }
+                },
+                box: null,
+                currElement: null,
+                attrBoxVisible: true,
+                templateBoxVisible: false
             }
         },
         mounted() {
-            var box = new DataBox('dataBox', $("#canvas")[0]);
+            var box = new DataBox('dataBox', document.getElementById('canvas'))
             this.box = box
             this.box.isShowRange = false;
             this.box.image = null
-            this.setMode('line')
-
-            var node = new Topo.Circle()
-            node.r = 100
-            node.setLocation(0, 0)
-            this.box.add(node)
+            this.setMode('common')
 
             this.box.subscribe('mousemove', e => {
                 this.curPosition = {
-                    x: e.dx,
-                    y: e.dy
+                    x: e.x,
+                    y: e.y
                 }
             })
+            this.box.subscribe('mouseup', e => {
+                console.log('up')
+                this.currElement = this.box.currElement
+            })
+
 //            //box.viewbox()
 //            //box.setBg('');
 //
@@ -154,7 +184,21 @@
         },
         methods: {
             init() {
+            },
+            addChildNode() {
+                if (!this.box.currElement) {
+                    alert('请选择节点')
+                    return
+                }
+                let node = new Topo.Node()
+                node.setImage('/static/img/laptop.png')
+                node.setSize(64, 64)
+                node.name = '未命名'
+                node.setLocation(this.box.currElement.x + 100, this.box.currElement.y)
+                this.box.add(node)
 
+                this.box.add(new Topo.Link(this.box.currElement, node))
+                this.box.updateView()
             },
             setMode(mode) {
                 this.box.mode = mode
@@ -576,5 +620,4 @@
 </script>
 
 <style scoped>
-
 </style>

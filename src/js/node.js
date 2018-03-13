@@ -10,7 +10,12 @@ class Node extends AbstractNode {
         this.height = 40
         this.x = 0
         this.y = 0
-        this.style = {fillStyle: '71, 167, 184', fontSize: '10pt', font: "Consolas"}
+        this.style = {
+            strokeStyle: '#666',
+            fillStyle: '71, 167, 184',
+            fontSize: '10pt',
+            font: "Consolas"
+        }
         this.type = null
         this.selected = false
 
@@ -24,8 +29,9 @@ class Node extends AbstractNode {
         if (!name || name == '') return
         let textWidth = ctx.measureText(name).width
         ctx.font = this.style.fontSize + ' ' + this.style.font
-        ctx.strokeStyle = 'rgba(230, 230, 230, ' + this.alpha + ')'
-        ctx.strokeText(name, -this.width / 2 + (this.width - textWidth) / 2, this.height / 2 + 12)
+        // ctx.strokeStyle = 'rgba(230, 230, 230, ' + this.alpha + ')'
+        ctx.strokeStyle = '#666'
+        ctx.strokeText(name, -this.width / 2 + (this.width - textWidth) / 2, this.height / 2 + 20)
     }
 
     drawTip(ctx) {
@@ -84,6 +90,7 @@ class Node extends AbstractNode {
             //ctx.rect(-this.width/2, -this.height/2, this.width, this.height)
             //ctx.clip()
             ctx.drawImage(image, -this.width / 2, -this.height / 2)
+            // ctx.drawImage(image, 0, 0, this.width, -this.height / 2)
         } else {
             ctx.beginPath()
             ctx.fillStyle = 'rgba(' + this.style.fillStyle + ',' + this.alpha + ')'
@@ -210,7 +217,10 @@ function TipNode(name) {
 function TextNode(name) {
     let node = new Node(name)
     node.setHeight(14)
-    node.style = {strokeStyle: 'rgba(255,255,255, 0.99)', fillStyle: 'rgba(255,255,255, 0.5)'}
+    node.style = {
+        strokeStyle: 'rgba(255,255,255, 0.99)',
+        fillStyle: 'rgba(255,255,255, 0.5)'
+    }
     node.draw = function (ctx) {
         ctx.save()
         ctx.beginPath()

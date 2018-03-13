@@ -369,6 +369,10 @@ class DataBox {
     }
 
     keydown(e) {
+        console.log(document.activeElement.nodeName)
+        if (document.activeElement.nodeName !== 'BODY') {
+            return;
+        }
         var box = this
         var keyID = e.keyCode ? e.keyCode : e.which
         box.publish('keydown', keyID)
