@@ -23,7 +23,11 @@ class DataBox {
         this.children = []
         this.viewBox = [0, 0, 800, 500]
         this.plugins = []
-
+        this.selection = null // 选区
+        this.defaultStyle = {
+            fill: '#0099cc',
+            stroke: '#000000'
+        }
         this.init()
     }
 
@@ -32,88 +36,9 @@ class DataBox {
         // this.ctx.shadowColor = 'rgba(0,0,0,0.5)'
         // this.ctx.shadowOffsetX = 3
         // this.ctx.shadowOffsetY = 6
-        // 矩形插件
-        this.plugins.push({
-            name: 'rect',
-            onMousemove(box, x, y) {
-                if (box.isOnMouseDown) {
-                    box.updateView()
-                    box.ctx.fillStyle = '#f00'
-                    let minX = Math.min(x, box.startDragMouseX)
-                    let minY = Math.min(y, box.startDragMouseY)
-                    box.ctx.fillRect(minX, minY, 
-                        Math.abs(x - box.startDragMouseX), Math.abs(y - box.startDragMouseY))
-                }
-            },
-            onMouseup(box, x, y) {
-                let minX = Math.min(x, box.startDragMouseX)
-                let minY = Math.min(y, box.startDragMouseY)
-                let width = Math.abs(x - box.startDragMouseX)
-                let height = Math.abs(y - box.startDragMouseY)
-                var hostNode = new Topo.Rect()
-                hostNode.setSize(width, height)
-                hostNode.setLocation(minX, minY)
-                box.add(hostNode)
-                box.updateView()
-                box.mode = 'common'
-            }
-        })
-        // 直线插件
-        this.plugins.push({
-            name: 'line',
-            onMousemove(box, x, y) {
-                if (box.isOnMouseDown) {
-                    box.updateView()
-                    box.ctx.lineWidth = 1
-                    box.ctx.strokeStyle = '#f00'
-                    box.ctx.beginPath()
-                    box.ctx.moveTo(box.startDragMouseX, box.startDragMouseY)
-                    box.ctx.lineTo(x, y)
-                    box.ctx.stroke()
-                }
-            },
-            onMouseup(box, x, y) {
-                let minX = Math.min(x, box.startDragMouseX)
-                let minY = Math.min(y, box.startDragMouseY)
-                let width = Math.abs(x - box.startDragMouseX)
-                let height = Math.abs(y - box.startDragMouseY)
-                
-                let line = new Topo.Line()
-                line.x = box.startDragMouseX
-                line.y = box.startDragMouseY
-                line.x2 = x
-                line.y2 = y
-                box.add(line)
-                box.updateView()
-                box.mode = 'common'
-            }
-        })
-        // 圆形插件
-        this.plugins.push({
-            name: 'round',
-            onMousemove(box, x, y) {
-                if (box.isOnMouseDown) {
-                    box.updateView()
-                    let minX = Math.min(x, box.startDragMouseX)
-                    let minY = Math.min(y, box.startDragMouseY)
-                    let radius = Math.sqrt(Math.pow(x - box.startDragMouseX, 2) + Math.pow(y - box.startDragMouseY, 2))
-                    
-                    box.ctx.fillStyle = '#f00'
-                    box.ctx.beginPath()
-                    box.ctx.arc(box.startDragMouseX, box.startDragMouseY, radius, 0, 2 * Math.PI)
-                    box.ctx.fill()
-                }
-            },
-            onMouseup(box, x, y) {
-                let radius = Math.sqrt(Math.pow(x - box.startDragMouseX, 2) + Math.pow(y - box.startDragMouseY, 2))
-                var node = new Topo.Circle()
-                node.r = radius
-                node.setLocation(box.startDragMouseX - radius, box.startDragMouseY - radius)
-                box.add(node)
-                box.updateView()
-                box.mode = 'common'
-            }
-        })
+        
+        this.initPlugin()
+        
         this.startDragMouseX = 0
         this.startDragMouseY = 0
         this.offset = $(canvas).offset()
@@ -150,12 +75,18 @@ class DataBox {
         }, 300)
     }
 
-    destroy() {
-        this.canvas.onmousedown = null
-        this.canvas.onmousemove = null
-        this.canvas.onmouseup = null
-        window.removeEventListener('keydown', this.onKeydown)
-        window.addEventListener('keyup', this.onKeyup)
+    initPlugin() {
+        // this.plugins.push()
+    }
+
+    addPlugin(plugin) {
+        this.plugins.push(plugin)
+    }
+
+    addPlugins(plugins) {
+        for (let plugin of plugins) {
+            this.plugins.push(plugin)
+        }
     }
 
     getElementByXY(x, y) {
@@ -692,6 +623,21 @@ class DataBox {
         // if (obj.version) {
         //
         // }
+    }
+
+    autoUpdate() {
+        this._timer = setInterval(() => {
+            this.updateView()
+        }, 100)
+    }
+
+    destroy() {
+        clearInterval(this._timer)
+        this.canvas.onmousedown = null
+        this.canvas.onmousemove = null
+        this.canvas.onmouseup = null
+        window.removeEventListener('keydown', this.onKeydown)
+        window.addEventListener('keyup', this.onKeyup)
     }
 }
 

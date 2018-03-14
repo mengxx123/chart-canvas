@@ -21,7 +21,8 @@ class Circle extends Node {
     this.height = h
     ctx.save()
     ctx.beginPath()
-    ctx.fillStyle = 'rgba(' + this.style.fillStyle + ',' + this.alpha + ')'
+    // ctx.fillStyle = 'rgba(' + this.style.fillStyle + ',' + this.alpha + ')'
+    ctx.fillStyle = this.style.fillStyle
     ctx.arc(this.x + w / 2, this.y + h / 2, w / 2, this.beginDegree, this.endDegree, true)
     ctx.fill()
     ctx.closePath()
@@ -39,7 +40,8 @@ class Rect extends Node {
       return
     }
 
-    ctx.fillStyle = 'rgba(' + this.style.fillStyle + ',' + this.alpha + ')'
+    // ctx.fillStyle = 'rgba(' + this.style.fillStyle + ',' + this.alpha + ')'
+    ctx.fillStyle = this.style.fillStyle
     ctx.fillRect(this.x, this.y, this.width, this.height)
   }
 }

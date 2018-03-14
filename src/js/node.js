@@ -12,7 +12,8 @@ class Node extends AbstractNode {
         this.y = 0
         this.style = {
             strokeStyle: '#666',
-            fillStyle: '71, 167, 184',
+            // fillStyle: '71, 167, 184',
+            fillStyle: '#ff0000',
             fontSize: '10pt',
             font: "Consolas"
         }
@@ -64,12 +65,13 @@ class Node extends AbstractNode {
         // let w = Math.max(this.width, textWidth)
         ctx.beginPath()
 
-        let strokeStyle = 'rgba(255, 0, 0, 0.9)'
+        let strokeStyle = '#09c'
         if (this.isSelected()) {
-            strokeStyle = '#000'
+            strokeStyle = '#009688'
         }
 
         ctx.strokeStyle = strokeStyle
+        ctx.lineWidth = 2
         ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height)
         ctx.stroke()
         ctx.closePath()
@@ -89,8 +91,8 @@ class Node extends AbstractNode {
         if (image != null) {
             //ctx.rect(-this.width/2, -this.height/2, this.width, this.height)
             //ctx.clip()
-            ctx.drawImage(image, -this.width / 2, -this.height / 2)
-            // ctx.drawImage(image, 0, 0, this.width, -this.height / 2)
+            // ctx.drawImage(image, -this.width / 2, -this.height / 2)
+            ctx.drawImage(image, 0 - this.width / 2, 0 - this.height / 2, this.width, this.height)
         } else {
             ctx.beginPath()
             ctx.fillStyle = 'rgba(' + this.style.fillStyle + ',' + this.alpha + ')'

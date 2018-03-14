@@ -19,13 +19,11 @@
                 <ui-raised-button class="btn" label="导出 PNG" @click="downloadPng"/>
                 <!-- <ui-raised-button class="btn" label="添加用例" @click="addCase"/> -->
                 <ui-raised-button class="btn" label="帮助" to="/help" target="_blank"/>
-                <ui-raised-button class="btn" label="选择工具" @click="setMode('select')" />
-                <ui-raised-button class="btn" label="画矩形" @click="setMode('rect')" />
-                <ui-raised-button class="btn" label="画圆" @click="setMode('round')" />
-                <ui-raised-button class="btn" label="画直线" @click="setMode('line')" />
+                
                 <ui-raised-button class="btn" label="清空" @click="clear" />
                 <ui-raised-button class="btn" label="选择模板" @click="templateBoxVisible = true" />
                 <ui-raised-button class="btn" label="显示属性面板" @click="attrBoxVisible = true" />
+                <ui-raised-button class="btn" label="显示类型面板" @click="typeBoxVisible = true" />
                 
             </div>
         </div>
@@ -58,22 +56,64 @@
             </code> -->
 
         </div>
+        <ui-drawer class="type-box" :open="typeBoxVisible" left>
+            <ui-appbar title="快速添加">
+                <ui-icon-button icon="close" slot="left" @click="typeBoxVisible = false" />
+            </ui-appbar>
+            <div class="body">
+                <div class="btn-group">
+                    <ui-icon-button 
+                        :class="{active: mode === 'common' }"
+                        @click="setMode('common')"
+                        icon=":icon icon-pointer" title="选择工具" />
+                    <ui-icon-button :class="{active: mode === 'rect' }"
+                        @click="setMode('rect')"
+                        icon=":icon icon-rect" title="矩形" />
+                    <ui-icon-button :class="{active: mode === 'round' }"
+                        @click="setMode('round')"
+                        icon=":icon icon-round" title="圆" />
+                    <ui-icon-button :class="{active: mode === 'line' }"
+                        @click="setMode('line')"
+                        icon=":icon icon-line" title="直线" />
+                </div>
+                <ul class="type-list">
+                    <li class="item" v-for="img in images" @click="insertImage(img)">
+                        <img class="img" :src="img">
+                    </li>
+                </ul>
+            </div>
+        </ui-drawer>
         <ui-drawer class="attr-box" :open="attrBoxVisible" right>
             <ui-appbar title="属性设置">
                 <ui-icon-button icon="close" slot="left" @click="attrBoxVisible = false" />
             </ui-appbar>
-            <div class="body">
+            <div class="body" v-if="box.selectedElements">
                 <div>（{{ curPosition.x }}，{{ curPosition.y }}）</div>
+                <div v-if="box.selectedElements.length">
+                    <ui-raised-button class="btn" label="删除节点" @click="remove" />
+                </div>
                 <div v-if="currElement">
                     <ui-raised-button class="btn" label="添加子节点" @click="addChildNode" />
-                    <ui-raised-button class="btn" label="删除节点" @click="remove" />
+                    <input type="color" v-model="currElement.style.fillStyle">
                     <ui-text-field v-model="currElement.name" label="节点名称" />
                     <!-- <ui-text-field v-model.number="currElement.alpha" label="不透明度" /> -->
-                    <!-- <ui-text-field v-model.number="currElement.width" label="宽度" /> -->
+                    <ui-text-field type="number" v-model.number="currElement.width" label="宽度" />
+                    <ui-text-field type="number" v-model.number="currElement.height" label="高度" />
                     <!-- {{ currElement }} -->
                 </div>
-                <div v-else>
+                <div v-if="box.selectedElements.length">
+                    <h2>操作</h2>
+                    <ui-raised-button class="btn" label="左对齐" @click="alignLft" />
+                    <ui-raised-button class="btn" label="水平居中" @click="alignCenter" />
+                    <ui-raised-button class="btn" label="右对齐" @click="alignRight" />
+                    <br>
+                    <ui-raised-button class="btn" label="上对齐" @click="alignTop" />
+                    <ui-raised-button class="btn" label="垂直居中" @click="alignMiddle" />
+                    <ui-raised-button class="btn" label="下对齐" @click="alignBottom" />
+                </div>
+                <div v-if="!box.selectedElements.length">
                     请选择节点进行编辑
+                    <input type="color" v-model="box.defaultStyle.fill">
                 </div>
             </div>
         </ui-drawer>
@@ -93,6 +133,7 @@
     /* eslint-disable */
     import '@/js/main'
     import DataBox from '@/js/databox'
+    import plugins from '@/js/plugin'
     
     export default {
         data() {
@@ -102,9 +143,19 @@
                     x: 0,
                     y: 0
                 },
-                box: null,
+                box: {},
+                images: [
+                    '/static/img/cloud.png',
+                    '/static/img/laptop.png',
+                    '/static/img/home.png',
+                    '/static/img/building.png',
+                    '/static/img/host.png',
+                    '/static/img/printer.png',
+                ],
+                mode: 'common',
                 currElement: null,
                 attrBoxVisible: true,
+                typeBoxVisible: true,
                 templateBoxVisible: false
             }
         },
@@ -113,6 +164,7 @@
             this.box = box
             this.box.isShowRange = false;
             this.box.image = null
+            this.box.addPlugins(plugins)
             this.setMode('common')
 
             this.box.subscribe('mousemove', e => {
@@ -177,7 +229,6 @@
 
             this.init()
             this.addCase()
-            box.updateView();
         },
         destroyed() {
             this.box.destroy()
@@ -198,9 +249,9 @@
                 this.box.add(node)
 
                 this.box.add(new Topo.Link(this.box.currElement, node))
-                this.box.updateView()
             },
             setMode(mode) {
+                this.mode = mode
                 this.box.mode = mode
             },
             rect() {
@@ -214,11 +265,18 @@
                     saveAs(blob, "pretty image.png")
                 })
             },
+            insertImage(img) {
+                var node = new Topo.Node()
+                node.setImage(img)
+                node.setSize(64, 64)
+                node.setLocation(0, 0)
+                this.box.add(node)
+            },
             addCase() {
                 var hostNode = new Topo.Node();
                 hostNode.setImage('/static/img/cloud.png');
                 hostNode.setSize(64, 64);
-                hostNode.setLocation(360,190);
+                hostNode.setLocation(360, 190);
                 this.box.add(hostNode);
 
                 var node = new Topo.Node();
@@ -254,8 +312,6 @@
                     box.add(new Topo.Link(node, node2));
                 }
 
-                box.updateView();
-
                 var time = new Date().getTime() - start;
                 console.log(time + 'ms');
             },
@@ -264,7 +320,6 @@
             },
             clear: function clear() {
                 this.box.clear()
-                this.box.updateView()
             },
             container1: function container1() {
                 function HostNode(name) {
@@ -402,8 +457,6 @@
                 vmNode.setLocation(100, 2000);
                 box.add(vmNode);
 
-                box.updateView();
-
                 setTimeout(function () {
                     vmNode.setLocation(100, 2000);
                 }, 500);
@@ -417,6 +470,42 @@
                         vmNode.setLocation(100, 2000);
                     }
                 });
+            },
+            alignLft() {
+                // this.box.currElement.x = 0
+                for (let elem of this.box.selectedElements) {
+                    elem.x = 0
+                }
+            },
+            alignCenter() {
+                // this.box.currElement.x = (this.box.width - this.box.currElement.width) / 2
+                for (let elem of this.box.selectedElements) {
+                    elem.x = (this.box.width - elem.width) / 2
+                }
+            },
+            alignRight() {
+                for (let elem of this.box.selectedElements) {
+                    elem.x = this.box.width - elem.width
+                }
+                // this.box.currElement.x = this.box.width - this.box.currElement.width
+            },
+            alignTop() {
+                for (let elem of this.box.selectedElements) {
+                    elem.y = 0
+                }
+                // this.box.currElement.y = 0
+            },
+            alignMiddle() {
+                // this.box.currElement.y = (this.box.height - this.box.currElement.height) / 2
+                for (let elem of this.box.selectedElements) {
+                    elem.y = (this.box.height - elem.height) / 2
+                }
+            },
+            alignBottom() {
+                // this.box.currElement.y = this.box.height - this.box.currElement.height
+                for (let elem of this.box.selectedElements) {
+                    elem.y = this.box.height - elem.height
+                }
             },
             tree: function tree() {
                 var hostNode = new Topo.Node();
@@ -432,8 +521,6 @@
                 //direction:'right top
                 hostNode.layout = { type: 'tree', width: 140, height: 90, direction: 'bottom' };
                 this.box.layoutNode(hostNode);
-
-                this.box.updateView();
             },
             uml: function uml() {
                 var User = {
@@ -461,8 +548,6 @@
 
                 this.box.addElement(new Topo.ArrowsFoldLink(userNode, accountNode));
                 this.box.addElement(new Topo.ArrowsLink(userNode, resourceNode));
-
-                this.box.updateView();
             },
             link: function link() {
                 (function () {
@@ -571,8 +656,6 @@
                 group.style = { fillStyle: '0, 0, 100' };
                 group.add(peopleNode);
                 group.add(defaultNode);
-
-                box.updateView();
             },
             star2: function star2() {
                 var cNode = new Topo.Node();

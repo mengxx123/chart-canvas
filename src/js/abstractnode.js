@@ -48,7 +48,7 @@ class AbstractNode extends Element {
         if(typeof i == 'string'){
             var img = this.image = new Image()
             this.image.onload = function(){
-                node.setSize(img.width, img.height)
+                // node.setSize(img.width, img.height)
             }
             this.image.src = i
         }else{
