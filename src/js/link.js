@@ -1,49 +1,117 @@
 import Element from './element'
 /* eslint-disable */
 class Link extends Element {
+
     constructor(nodeA, nodeB) {
         super()
-
         this.nodeA = nodeA
         this.nodeB = nodeB
-        this.style = {strokeStyle: '116, 166, 250', alpha: 1, lineWidth: 2}
+        // TODO 跟 Node 重复
+        this.style = {
+            strokeColor: '#666',
+            strokeWidth: 1,
+            fillColor: '#ff0000',
+            strokeDash: 0,
+            fontSize: '10pt',
+            font: "Consolas"
+        }
+        // this.style = {strokeStyle: '116, 166, 250', alpha: 1, lineWidth: 2}
+    }
+
+    // TODO 跟 Node 重复
+    setContextStyle(ctx) {
+        ctx.fillStyle = this.style.fillColor
+        ctx.strokeStyle = this.style.strokeColor
+        ctx.lineWidth = this.style.strokeWidth
+        ctx.setLineDash([this.style.strokeDash])
     }
 
     draw(ctx) {
         ctx.save()
         ctx.beginPath()
-        ctx.strokeStyle = 'rgba(' + this.style.strokeStyle + ',' + this.style.alpha + ')'
-        ctx.lineWidth = this.style.lineWidth
-        ctx.moveTo(this.nodeA.x + this.nodeA.width / 2, this.nodeA.y + this.nodeA.height / 2)
-        ctx.lineTo(this.nodeB.x + this.nodeB.width / 2, this.nodeB.y + this.nodeB.height / 2)
+        this.setContextStyle(ctx)
+        let startPt = this.getStartPt()
+        let endPt = this.getEndPt()
+        ctx.moveTo(startPt.x, startPt.y)
+        ctx.lineTo(endPt.x, endPt.y)
         ctx.stroke()
         ctx.closePath()
         ctx.restore()
+        this.drawText(ctx)
+    }
+
+    drawText(ctx) {
+        if (this.name) {
+            let startPt = this.getStartPt()
+            let endPt = this.getEndPt()
+            let center = {
+                x: (startPt.x + endPt.x) / 2,
+                y: (startPt.y + endPt.y) / 2
+            }
+            
+            // draw text background
+            ctx.fillStyle = '#fff'
+            ctx.strokeStyle = '#eee'
+            ctx.lineWidth = 1
+            ctx.beginPath()
+            let textWidth = ctx.measureText(this.name).width
+            ctx.rect(center.x - 20, center.y - 20, textWidth + 40, 32)
+            ctx.fill()
+            ctx.stroke()
+
+            // draw text
+            ctx.strokeStyle = '#333'
+            ctx.lineWidth = 1
+            ctx.font="14px 微软雅黑";
+            ctx.setLineDash([])
+            ctx.beginPath()
+            ctx.strokeText(this.name, center.x, center.y)
+        }
+    }
+
+    getStartPt() {
+        return {
+            x: this.nodeA.node.x + this.nodeA.node.width * this.nodeA.x,
+            y:  this.nodeA.node.y + this.nodeA.node.height * this.nodeA.y
+        }
+    }
+
+    getEndPt() {
+        return {
+            x: this.nodeB.node.x + this.nodeB.node.width * this.nodeB.x,
+            y:  this.nodeB.node.y + this.nodeB.node.height * this.nodeB.y
+        }
     }
 
     getLength() {
-        return getDistance(this.nodeA , this.nodeB)
+        return getDistance(this.nodeA.node , this.nodeB.node)
     }
 }
 
-function FoldLink(nodeA, nodeB) {
-    var link = new Link(nodeA, nodeB)
-    link.fold = 'x'
-    link.draw = function (ctx) {
-        var x1 = this.nodeA.x
-        var y1 = this.nodeA.y
-        var x2 = this.nodeB.x
-        var y2 = this.nodeB.y
+class FoldLink extends Link {
+
+    constructor(nodeA, nodeB) {
+        super(nodeA, nodeB)
+        this.fold = 'x'
+    }
+
+    draw(ctx) {
+        var x1 = this.nodeA.node.x
+        var y1 = this.nodeA.node.y
+        var x2 = this.nodeB.node.x
+        var y2 = this.nodeB.node.y
         var mx = x1
         var my = y1
 
+        let startPt = this.getStartPt()
+        let endPt = this.getEndPt()
         if(x1 == x2 || y1 == y2){
             ctx.save()
             ctx.beginPath()
             ctx.strokeStyle = 'rgba(' + this.style.strokeStyle + ',' + this.style.alpha + ')'
             ctx.lineWidth = this.style.lineWidth
-            ctx.moveTo(this.nodeA.x + this.nodeA.width / 2, this.nodeA.y + this.nodeA.height / 2)
-            ctx.lineTo(this.nodeB.x + this.nodeB.width / 2, this.nodeB.y + this.nodeB.height / 2)
+            ctx.moveTo(startPt.x, startPt.y)
+            ctx.lineTo(endPt.x, endPt.y)
             ctx.closePath()
             ctx.stroke()
             ctx.restore()
@@ -57,27 +125,28 @@ function FoldLink(nodeA, nodeB) {
             ctx.beginPath()
             ctx.strokeStyle = 'rgba(' + this.style.strokeStyle + ',' + this.style.alpha + ')'
             ctx.lineWidth = this.style.lineWidth
-            ctx.moveTo(x1 + this.nodeA.width / 2, y1+ this.nodeA.height / 2)
-            ctx.lineTo(mx + this.nodeA.width / 2, my+ this.nodeA.height / 2)
-            ctx.lineTo(x2 + this.nodeA.width / 2, y2+ this.nodeA.height / 2)
+            ctx.moveTo(x1 + this.nodeA.node.width / 2, y1+ this.nodeA.node.height / 2)
+            ctx.lineTo(mx + this.nodeA.node.width / 2, my+ this.nodeA.node.height / 2)
+            ctx.lineTo(x2 + this.nodeA.node.width / 2, y2+ this.nodeA.node.height / 2)
             ctx.stroke()
             ctx.closePath()
             ctx.restore()
         }
     }
-
-    return link
 }
 
+class CurveLink extends Link {
 
-function CurveLink(nodeA, nodeB) {
-    var link = new Link(nodeA, nodeB)
-    link.curve = 0.5
-    link.draw = function (ctx) {
-        var x1 = this.nodeA.x
-        var y1 = this.nodeA.y
-        var x2 = this.nodeB.x
-        var y2 = this.nodeB.y
+    constructor(nodeA, nodeB) {
+        super(nodeA, nodeB)
+        this.curve = 0.5
+    }
+
+    draw(ctx) {
+        var x1 = this.nodeA.node.x
+        var y1 = this.nodeA.node.y
+        var x2 = this.nodeB.node.x
+        var y2 = this.nodeB.node.y
         var mx = x1
         var my = y1
 
@@ -91,14 +160,13 @@ function CurveLink(nodeA, nodeB) {
         ctx.beginPath()
         ctx.strokeStyle = 'rgba(' + this.style.strokeStyle + ',' + this.style.alpha + ')'
         ctx.lineWidth = this.style.lineWidth
-        ctx.moveTo(x1 + this.nodeA.width / 2, y1+ this.nodeA.height / 2)
-        ctx.quadraticCurveTo(mx + this.nodeA.width / 2, my+ this.nodeA.height / 2,
-                x2 + this.nodeA.width / 2, y2+ this.nodeA.height / 2)
+        ctx.moveTo(x1 + this.nodeA.node.width / 2, y1+ this.nodeA.node.height / 2)
+        ctx.quadraticCurveTo(mx + this.nodeA.node.width / 2, my+ this.nodeA.node.height / 2,
+                x2 + this.nodeA.node.width / 2, y2+ this.nodeA.node.height / 2)
         ctx.stroke()
         ctx.closePath()
         ctx.restore()
     }
-    return link
 }
 
 function ArrowsLink(nodeA, nodeB){

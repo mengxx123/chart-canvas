@@ -63,8 +63,8 @@
             <div class="body">
                 <div class="btn-group">
                     <ui-icon-button 
-                        :class="{active: mode === 'common' }"
-                        @click="setMode('common')"
+                        :class="{active: mode === 'select' }"
+                        @click="setMode('select')"
                         icon=":icon icon-pointer" title="选择工具" />
                     <ui-icon-button :class="{active: mode === 'rect' }"
                         @click="setMode('rect')"
@@ -75,6 +75,10 @@
                     <ui-icon-button :class="{active: mode === 'line' }"
                         @click="setMode('line')"
                         icon=":icon icon-line" title="直线" />
+                    <br>
+                    <ui-icon-button :class="{active: mode === 'join' }"
+                        @click="setMode('join')"
+                        icon=":icon icon-line" title="连线" />
                 </div>
                 <ul class="type-list">
                     <li class="item" v-for="img in images" @click="insertImage(img)">
@@ -93,7 +97,7 @@
                     <ui-raised-button class="btn" label="删除节点" @click="remove" />
                 </div>
                 <div v-if="currElement">
-                    <ui-raised-button class="btn" label="添加子节点" @click="addChildNode" />
+                    <!-- <ui-raised-button class="btn" label="添加子节点" @click="addChildNode" /> -->
                     <input type="color" v-model="currElement.style.fillStyle">
                     <ui-text-field v-model="currElement.name" label="节点名称" />
                     <!-- <ui-text-field v-model.number="currElement.alpha" label="不透明度" /> -->
@@ -113,7 +117,20 @@
                 </div>
                 <div v-if="!box.selectedElements.length">
                     请选择节点进行编辑
-                    <input type="color" v-model="box.defaultStyle.fill">
+                    <br>
+                    <div>填充色</div>
+                    <input type="color" v-model="box.defaultStyle.fillColor">
+                    <div v-if="box.defaultStyle.fillColor === 'transparent'">透明</div>
+                    <button @click="box.defaultStyle.fillColor = 'transparent'">设为透明</button>
+                    <br>
+                    <div>线条颜色</div>
+                    <input type="color" v-model="box.defaultStyle.strokeColor">
+                    <br>
+                    <div>线条宽度</div>
+                    <input type="number" v-model.number="box.defaultStyle.strokeWidth">
+                    <br>
+                    <div>虚线值（0 则为实线）</div>
+                    <input type="number" v-model.number="box.defaultStyle.strokeDash">
                 </div>
             </div>
         </ui-drawer>
@@ -133,7 +150,7 @@
     /* eslint-disable */
     import '@/js/main'
     import DataBox from '@/js/databox'
-    import plugins from '@/js/plugin'
+    import plugins from '@/js/plugin/index'
     
     export default {
         data() {
@@ -152,7 +169,7 @@
                     '/static/img/host.png',
                     '/static/img/printer.png',
                 ],
-                mode: 'common',
+                mode: '',
                 currElement: null,
                 attrBoxVisible: true,
                 typeBoxVisible: true,
@@ -165,7 +182,8 @@
             this.box.isShowRange = false;
             this.box.image = null
             this.box.addPlugins(plugins)
-            this.setMode('common')
+            this.setMode('select')
+            this.box.autoUpdate()
 
             this.box.subscribe('mousemove', e => {
                 this.curPosition = {
@@ -247,7 +265,6 @@
                 node.name = '未命名'
                 node.setLocation(this.box.currElement.x + 100, this.box.currElement.y)
                 this.box.add(node)
-
                 this.box.add(new Topo.Link(this.box.currElement, node))
             },
             setMode(mode) {
@@ -277,14 +294,27 @@
                 hostNode.setImage('/static/img/cloud.png');
                 hostNode.setSize(64, 64);
                 hostNode.setLocation(360, 190);
+                hostNode.name = 'AAA'
                 this.box.add(hostNode);
 
                 var node = new Topo.Node();
                 node.setImage('/static/img/laptop.png');
                 node.setSize(64, 64);
                 node.setLocation(200, 100)
+                node.name = 'BBB'
                 this.box.add(node);
-                this.box.add(new Topo.Link(hostNode, node));
+
+                let link = new Topo.Link({
+                    node: hostNode,
+                    x: 0,
+                    y: 0.5
+                }, {
+                    node: node,
+                    x: 1,
+                    y: 0.5
+                })
+                link.name = '哈哈'
+                this.box.add(link)
             },
             search() {
                 this.box.search(this.keyword)
@@ -296,7 +326,7 @@
                 let json = '{"version":"1.0","title":"测试文件"}'
                 this.box.loadJson(json)
             },
-            testing: function testing() {
+            testing() {
                 var start = new Date().getTime();
                 for (var i = 0; i < 1000; i++) {
                     var node = new Topo.Node();
@@ -318,10 +348,10 @@
             remove() {
                 this.box.removeSelectedElement()
             },
-            clear: function clear() {
+            clear() {
                 this.box.clear()
             },
-            container1: function container1() {
+            container1() {
                 function HostNode(name) {
                     var node = new Topo.Node(name);
                     node.setType('host');
@@ -381,7 +411,7 @@
                     box.add(group);
                 })();
             },
-            container: function container() {
+            container() {
                 (function () {
                     var text1 = new Topo.TextNode('Shelf-1');
                     text1.setLocation(190, 300);
@@ -438,7 +468,7 @@
                     box.add(group);
                 })();
             },
-            device: function device() {
+            device() {
                 box.image.src = '/static/img/room.jpg';
 
                 for (var i = 0; i < 5; i++) {
@@ -703,4 +733,7 @@
 </script>
 
 <style scoped>
+    .asd {
+        cursor: crosshair
+    }
 </style>

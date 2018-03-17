@@ -25,8 +25,10 @@ class DataBox {
         this.plugins = []
         this.selection = null // 选区
         this.defaultStyle = {
-            fill: '#0099cc',
-            stroke: '#000000'
+            fillColor: 'transparent',
+            strokeColor: '#000000',
+            strokeWidth: 1,
+            strokeDash: 4,
         }
         this.init()
     }
@@ -64,15 +66,25 @@ class DataBox {
             box.mouseup(event)
         }
         window.addEventListener('keydown', this.onKeydown = function (e) {
-            box.keydown(e)
+            return box.keydown(e)
         }, true)
         window.addEventListener('keyup', this.onKeyup = function (e) {
-            box.keyup(e)
+            return box.keyup(e)
         }, true)
+    }
 
-        setTimeout(function () {
-            box.updateView()
-        }, 300)
+    setDefaultStyle() {
+        this.ctx.fillStyle = this.defaultStyle.fillColor
+        this.ctx.lineWidth = this.defaultStyle.strokeWidth
+        this.ctx.strokeStyle = this.defaultStyle.strokeColor
+        this.ctx.setLineDash([this.defaultStyle.strokeDash])
+    }
+
+    setDefaultStyleToNode(node) {
+        node.style.fillColor = this.defaultStyle.fillColor
+        node.style.strokeWidth = this.defaultStyle.strokeWidth
+        node.style.strokeColor = this.defaultStyle.strokeColor
+        node.style.strokeDash = this.defaultStyle.strokeDash
     }
 
     initPlugin() {
@@ -120,7 +132,6 @@ class DataBox {
                 this.selectedElements.push(node)
             }
         }
-        this.updateView()
     }
 
     getElementByName(name) {
@@ -161,40 +172,17 @@ class DataBox {
         var x = xy.x
         var y = xy.y
 
-        var selectedNode = box.getElementByXY(x, y)
-        if (selectedNode) {
-            if (this.ctrlDown) {
-                selectedNode.onMousedown({x: x, y: y, context: box})
-                box.currElement = selectedNode
-            } else {
-                selectedNode.onMousedown({x: x, y: y, context: box})
-                box.currElement = selectedNode
-            }
-
-        } else if (box.currElement) {
-            box.currElement.cancleSelected()
-            box.currElement = null
-        }
-
+        box.isOnMouseDown = true
         box.startDragMouseX = x
         box.startDragMouseY = y
-
-        if (box.currElement) {
-            if (box.selectedElements.indexOf(box.currElement) == -1) {
-                box.cancleAllSelected()
-                box.selectedElements.push(box.currElement)
-            }
-        } else {
-            box.cancleAllSelected()
-        }
-
-        for (var i = 0; i < box.selectedElements.length; i++) {
-            var node = box.selectedElements[i]
-            node.selectedLocation = {x: node.x, y: node.y}
-        }
-
-        box.isOnMouseDown = true
+        
         box.publish('mousedown', {target: box.currElement, x: x, y: y, context: box})
+        for (let plugin of this.plugins) {
+            if (plugin.name === this.mode) {
+                plugin.onMousedown && plugin.onMousedown(this, xy.x, xy.y)
+                break
+            }
+        }
     }
 
     mousemove(event) {
@@ -206,66 +194,10 @@ class DataBox {
         var dy = (y - box.startDragMouseY)
         box.publish('mousemove', {target: box.currElement, x: x, y: y, dx: dx, dy: dy, context: box})
 
-        if (this.mode !== 'common') {
-            for (let plugin of this.plugins) {
-                if (plugin.name === this.mode) {
-                    plugin.onMousemove && plugin.onMousemove(this, xy.x, xy.y)
-                    break
-                }
-            }
-            return
-        }
-
-        //if(box.currElement && !box.currElement.isDragable()) return
-
-        box.updateView()
-        for (var i = this.nodes.length - 1; i >= 0; i--) {
-            var node = this.nodes[i]
-            if (node.x + node.width < 0 || node.x > box.canvas.width) continue
-
-            if (x > node.x && x < node.x + node.width && y > node.y && y < node.y + node.height) {
-                node.onMouseover({x: x, y: y, dx: dx, dy: dy, context: box})
-                box.publish('mouseover', {target: node, x: x, y: y, dx: dx, dy: dy, context: box})
-            } else {
-                if (node.isOnMousOver) {
-                    node.onMouseout({x: x, y: y, dx: dx, dy: dy, context: box})
-                    box.publish('mouseout', {target: node, x: x, y: y, dx: dx, dy: dy, context: box})
-                }
-            }
-        }
-
-        if (box.currElement && box.isOnMouseDown && box.currElement.dragable) {
-            for (var i = 0; i < box.selectedElements.length; i++) {
-                var node = box.selectedElements[i]
-                node.onMousedrag({x: x, y: y, dx: dx, dy: dy, context: box})
-            }
-            box.publish('mousedrag', {target: box.currElement, x: x, y: y})
-        } else if (box.isOnMouseDown && box.isRangeSelectable) {
-            // 绘制选区
-            var startx = x >= box.startDragMouseX ? box.startDragMouseX : x
-            var starty = y >= box.startDragMouseY ? box.startDragMouseY : y
-            var width = Math.abs(x - box.startDragMouseX)
-            var height = Math.abs(y - box.startDragMouseY)
-            box.ctx.beginPath()
-            box.ctx.fillStyle = 'rgba(168,202,236,0.5)'
-            box.ctx.fillRect(startx, starty, width, height)
-            box.ctx.closePath()
-
-            // 选中选区内的元素
-            let isInSelectArea = function (node) {
-                let outOfSelectArea = node.x > startx + width || node.x + node.width < startx
-                        || node.y > starty + height || node.y + node.height < starty
-                return !outOfSelectArea
-            }
-            box.selectedElements = []
-            for (var i = 0; i < box.nodes.length; i++) {
-                var node = box.nodes[i]
-                if (isInSelectArea(node)) {
-                    node.onMouseselected({x: x, y: y, dx: dx, dy: dy, context: box})
-                    box.selectedElements.push(node)
-                } else {
-                    node.cancleSelected()
-                }
+        for (let plugin of this.plugins) {
+            if (plugin.name === this.mode) {
+                plugin.onMousemove && plugin.onMousemove(this, xy.x, xy.y)
+                break
             }
         }
     }
@@ -277,37 +209,24 @@ class DataBox {
         var y = xy.y
         var dx = (x - box.startDragMouseX)
         var dy = (y - box.startDragMouseY)
-
         box.publish('mouseup', {target: box.currElement, x: x, y: y, dx: dx, dy: dy, context: box})
-        // box.startDragMouseX = null
-
-        if (box.currElement) {
-            box.currElement.onMouseup({x: x, y: y, context: box, dx: dx, dy: dy})
-        }
-
-        box.updateView()
         box.isOnMouseDown = false
 
-        if (this.mode !== 'common') {
-            for (let plugin of this.plugins) {
-                if (plugin.name === this.mode) {
-                    plugin.onMouseup && plugin.onMouseup(this, xy.x, xy.y)
-                    break
-                }
+        for (let plugin of this.plugins) {
+            if (plugin.name === this.mode) {
+                plugin.onMouseup && plugin.onMouseup(this, xy.x, xy.y)
+                break
             }
-            return
         }
     }
 
     keydown(e) {
-        console.log(document.activeElement.nodeName)
         if (document.activeElement.nodeName !== 'BODY') {
             return;
         }
         var box = this
         var keyID = e.keyCode ? e.keyCode : e.which
         box.publish('keydown', keyID)
-        // box.updateView()
         let grid = 4
         switch (keyID) {
             case 8: // Backspace
@@ -316,7 +235,6 @@ class DataBox {
             case 27: // Esc
                 this.cancleAllSelected()
                 this.currElement = null
-                box.updateView()
                 return false
             case 38: // up arrow and W
             case 87:
@@ -331,7 +249,6 @@ class DataBox {
                         elem.y -= grid
                     })
                 }
-                box.updateView()
                 return false
             case 39: // right arrow and D
             case 68:
@@ -339,12 +256,10 @@ class DataBox {
                     this.dealSelectedElement(elem => {
                         elem.width += grid
                     })
-                    box.updateView()
                 } else {
                     this.dealSelectedElement(elem => {
                         elem.x += grid
                     })
-                    box.updateView()
                 }
                 return false
             case 40: // down arrow and S
@@ -358,7 +273,6 @@ class DataBox {
                         elem.y += grid
                     })
                 }
-                box.updateView()
                 return false
             case 37: // left arrow and A
             case 65:
@@ -373,7 +287,6 @@ class DataBox {
                         elem.x -= grid
                     })
                 }
-                box.updateView()
                 return false
             case 17:
                 this.ctrlDown = true
@@ -390,7 +303,6 @@ class DataBox {
                 this.ctrlDown = false
                 break
         }
-        box.updateView()
     }
 
     subscribe(topic, action) {
@@ -406,7 +318,7 @@ class DataBox {
     removeElementById(id) {
         for (var i = 0; i < this.elements.length; i++) {
             if (this.elements[i].id == id) {
-                this.remove(i)
+                this.remove(this.elements[i])
                 break
             }
         }
@@ -428,7 +340,6 @@ class DataBox {
         }
         this.selectedElement = null
         this.selectedElements = []
-        this.updateView()
     }
 
     dealSelectedElement(callback) {
@@ -583,11 +494,13 @@ class DataBox {
             this.ctx.drawImage(this.image, 0, 0)
         }
 
-        for (var i = 0; i < this.links.length; i++) {
-            var link = this.links[i]
-            if (link.nodeA.x + link.nodeA.width < 0 || link.nodeA.x > box.canvas.width) continue
-            if (link.nodeB.x + link.nodeA.width < 0 || link.nodeB.x > box.canvas.width) continue
-
+        for (let link of this.links) {
+            if (link.nodeA.x + link.nodeA.width < 0 || link.nodeA.x > box.canvas.width) {
+                continue
+            }
+            if (link.nodeB.x + link.nodeA.width < 0 || link.nodeB.x > box.canvas.width) {
+                continue
+            }
             link.draw(this.ctx)
         }
 
@@ -598,12 +511,20 @@ class DataBox {
             this.containers[i].draw(this.ctx)
         }
 
-        for (var i = 0; i < this.nodes.length; i++) {
-            let node = this.nodes[i]
-            if (this.nodes[i].x + this.nodes[i].width < 0 || this.nodes[i].x > box.canvas.width) continue
-            this.nodes[i].draw(this.ctx)
+        for (let node of this.nodes) {
+            if (node.x + node.width < 0 || node.x > box.canvas.width) {
+                continue
+            }
+            node.draw(this.ctx)
             if (node.isSelected() || node.isFocus()) {
                 node.drawSelectedRect(this.ctx)
+            }
+        }
+
+        for (let plugin of this.plugins) {
+            if (plugin.name === this.mode) {
+                plugin.draw && plugin.draw(this)
+                break
             }
         }
     }
@@ -626,9 +547,17 @@ class DataBox {
     }
 
     autoUpdate() {
+        let lastTime = 0
+        this.updating = false
         this._timer = setInterval(() => {
+            let time = new Date().getTime()
+            if (this.updating) {
+                // alert(1)
+            }
+            this.updating = true
             this.updateView()
-        }, 100)
+            this.updating = false
+        }, 50)
     }
 
     destroy() {

@@ -233,4 +233,8 @@ class Element {
     }
 }
 
+Element.fromJson = function (json) {
+    return new Element()
+}
+
 export default Element

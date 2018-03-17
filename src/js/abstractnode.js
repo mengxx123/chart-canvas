@@ -28,8 +28,6 @@ class AbstractNode extends Element {
         this.fixed = false
     }
 
-
-
     getName() {
         return this.name
     }

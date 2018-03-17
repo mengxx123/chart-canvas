@@ -6,14 +6,15 @@ class Node extends AbstractNode {
 
         console.log(name)
         this.name = name
-        this.width = 40
-        this.height = 40
         this.x = 0
         this.y = 0
+        this.width = 40
+        this.height = 40
         this.style = {
-            strokeStyle: '#666',
-            // fillStyle: '71, 167, 184',
-            fillStyle: '#ff0000',
+            strokeColor: '#666',
+            strokeWidth: 0,
+            fillColor: '#ff0000',
+            strokeDash: 0,
             fontSize: '10pt',
             font: "Consolas"
         }
@@ -25,13 +26,23 @@ class Node extends AbstractNode {
         this.rotate = 0
     }
 
+    setContextStyle(ctx) {
+        ctx.fillStyle = this.style.fillColor
+        ctx.strokeStyle = this.style.strokeColor
+        ctx.lineWidth = this.style.strokeWidth
+        ctx.setLineDash([this.style.strokeDash])
+    }
+
     drawText(ctx) {
         let name = this.getName()
         if (!name || name == '') return
         let textWidth = ctx.measureText(name).width
         ctx.font = this.style.fontSize + ' ' + this.style.font
         // ctx.strokeStyle = 'rgba(230, 230, 230, ' + this.alpha + ')'
+        ctx.lineWidth = 1
         ctx.strokeStyle = '#666'
+        ctx.setLineDash([])
+        ctx.beginPath()
         ctx.strokeText(name, -this.width / 2 + (this.width - textWidth) / 2, this.height / 2 + 20)
     }
 
@@ -70,8 +81,9 @@ class Node extends AbstractNode {
             strokeStyle = '#009688'
         }
 
-        ctx.strokeStyle = strokeStyle
         ctx.lineWidth = 2
+        ctx.strokeStyle = strokeStyle
+        ctx.setLineDash([])
         ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height)
         ctx.stroke()
         ctx.closePath()
