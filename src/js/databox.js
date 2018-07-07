@@ -28,7 +28,7 @@ class DataBox {
             fillColor: 'transparent',
             strokeColor: '#000000',
             strokeWidth: 1,
-            strokeDash: 4,
+            strokeDash: 0,
         }
         this.init()
     }

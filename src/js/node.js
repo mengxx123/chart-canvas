@@ -41,9 +41,10 @@ class Node extends AbstractNode {
         // ctx.strokeStyle = 'rgba(230, 230, 230, ' + this.alpha + ')'
         ctx.lineWidth = 1
         ctx.strokeStyle = '#666'
+        ctx.fillStyle = '#666'
         ctx.setLineDash([])
         ctx.beginPath()
-        ctx.strokeText(name, -this.width / 2 + (this.width - textWidth) / 2, this.height / 2 + 20)
+        ctx.fillText(name, -this.width / 2 + (this.width - textWidth) / 2, this.height / 2 + 20)
     }
 
     drawTip(ctx) {

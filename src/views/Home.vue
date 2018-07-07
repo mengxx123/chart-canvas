@@ -1,7 +1,33 @@
 <template>
     <my-page title="拓扑图">
+        <div class="layout-type">
+            <div class="btn-group">
+                <ui-icon-button 
+                    :class="{active: mode === 'select' }"
+                    @click="setMode('select')"
+                    icon=":icon icon-pointer" title="选择工具" />
+                <ui-icon-button :class="{active: mode === 'rect' }"
+                    @click="setMode('rect')"
+                    icon=":icon icon-rect" title="矩形" />
+                <ui-icon-button :class="{active: mode === 'round' }"
+                    @click="setMode('round')"
+                    icon=":icon icon-round" title="圆" />
+                <ui-icon-button :class="{active: mode === 'line' }"
+                    @click="setMode('line')"
+                    icon=":icon icon-line" title="直线" />
+                <br>
+                <ui-icon-button :class="{active: mode === 'join' }"
+                    @click="setMode('join')"
+                    icon=":icon icon-line" title="连线" />
+            </div>
+            <ul class="type-list">
+                <li class="item" v-for="img in images" @click="insertImage(img)">
+                    <img class="img" :src="img">
+                </li>
+            </ul>
+        </div>
         <div class="layout-tool">
-            <div>
+            <div class="content">
                 <!-- <label><input type="radio" name="type">默认</label> -->
                 <!-- <label><input type="radio" name="type">框选</label> -->
                 <!-- <label><input type="radio" name="type">加线</label> -->
@@ -22,15 +48,62 @@
                 
                 <ui-raised-button class="btn" label="清空" @click="clear" />
                 <ui-raised-button class="btn" label="选择模板" @click="templateBoxVisible = true" />
-                <ui-raised-button class="btn" label="显示属性面板" @click="attrBoxVisible = true" />
-                <ui-raised-button class="btn" label="显示类型面板" @click="typeBoxVisible = true" />
+                <!-- <ui-raised-button class="btn" label="显示属性面板" @click="attrBoxVisible = true" /> -->
+                <!-- <ui-raised-button class="btn" label="切换类型面板" @click="typeBoxVisible = !typeBoxVisible" /> -->
                 
             </div>
         </div>
         <div class="layout-content">
-            <canvas id="canvas" style="" width="800" height="500"></canvas>
+            <div class="editor-box">
+                <div class="editor">
+                    <canvas id="canvas" class="canvas" width="800" height="500"></canvas>
+                </div>
+            </div>
         </div>
         <div id="app" class="layout-side">
+            <div class="body" v-if="box.selectedElements">
+                <div>（{{ curPosition.x }}，{{ curPosition.y }}）</div>
+                <div v-if="box.selectedElements.length">
+                    <ui-raised-button class="btn" label="删除节点" @click="remove" />
+                </div>
+                <div v-if="currElement">
+                    <!-- <ui-raised-button class="btn" label="添加子节点" @click="addChildNode" /> -->
+                    <input type="color" v-model="currElement.style.fillStyle">
+                    <ui-text-field v-model="currElement.name" label="节点名称" />
+                    <!-- <ui-text-field v-model.number="currElement.alpha" label="不透明度" /> -->
+                    <ui-text-field class="input-sm margin-right" type="number" v-model.number="currElement.x" label="X" />
+                    <ui-text-field class="input-sm margin-right" type="number" v-model.number="currElement.y" label="Y" />
+                    <br>
+                    <ui-text-field class="input-sm margin-right" type="number" v-model.number="currElement.width" label="宽度" />
+                    <ui-text-field class="input-sm" type="number" v-model.number="currElement.height" label="高度" />
+                    <!-- {{ currElement }} -->
+                </div>
+                <div v-if="box.selectedElements.length">
+                    <h2>操作</h2>
+                    <ui-raised-button class="btn" label="左对齐" @click="alignLft" />
+                    <ui-raised-button class="btn" label="水平居中" @click="alignCenter" />
+                    <ui-raised-button class="btn" label="右对齐" @click="alignRight" />
+                    <br>
+                    <ui-raised-button class="btn" label="上对齐" @click="alignTop" />
+                    <ui-raised-button class="btn" label="垂直居中" @click="alignMiddle" />
+                    <ui-raised-button class="btn" label="下对齐" @click="alignBottom" />
+                </div>
+                <div v-if="!box.selectedElements.length">
+                    请选择节点进行编辑
+                    <br>
+                    <div>填充色</div>
+                    <input type="color" v-model="box.defaultStyle.fillColor">
+                    <div v-if="box.defaultStyle.fillColor === 'transparent'">透明</div>
+                    <button @click="box.defaultStyle.fillColor = 'transparent'">设为透明</button>
+                    <br>
+                    <div>线条颜色</div>
+                    <input type="color" v-model="box.defaultStyle.strokeColor">
+                    <br>
+                    <ui-text-field type="number" v-model.number="box.defaultStyle.strokeWidth" label="线条宽度" />
+                    <br>
+                    <ui-text-field type="number" v-model.number="box.defaultStyle.strokeDash" label="虚线值（0 则为实线）" />
+                </div>
+            </div>
             <!-- <button @click="node">Mode</button> -->
             <!-- <button @click="star">star</button> -->
             <!-- <button @click="star2">star2</button> -->
@@ -91,48 +164,7 @@
             <ui-appbar title="属性设置">
                 <ui-icon-button icon="close" slot="left" @click="attrBoxVisible = false" />
             </ui-appbar>
-            <div class="body" v-if="box.selectedElements">
-                <div>（{{ curPosition.x }}，{{ curPosition.y }}）</div>
-                <div v-if="box.selectedElements.length">
-                    <ui-raised-button class="btn" label="删除节点" @click="remove" />
-                </div>
-                <div v-if="currElement">
-                    <!-- <ui-raised-button class="btn" label="添加子节点" @click="addChildNode" /> -->
-                    <input type="color" v-model="currElement.style.fillStyle">
-                    <ui-text-field v-model="currElement.name" label="节点名称" />
-                    <!-- <ui-text-field v-model.number="currElement.alpha" label="不透明度" /> -->
-                    <ui-text-field type="number" v-model.number="currElement.width" label="宽度" />
-                    <ui-text-field type="number" v-model.number="currElement.height" label="高度" />
-                    <!-- {{ currElement }} -->
-                </div>
-                <div v-if="box.selectedElements.length">
-                    <h2>操作</h2>
-                    <ui-raised-button class="btn" label="左对齐" @click="alignLft" />
-                    <ui-raised-button class="btn" label="水平居中" @click="alignCenter" />
-                    <ui-raised-button class="btn" label="右对齐" @click="alignRight" />
-                    <br>
-                    <ui-raised-button class="btn" label="上对齐" @click="alignTop" />
-                    <ui-raised-button class="btn" label="垂直居中" @click="alignMiddle" />
-                    <ui-raised-button class="btn" label="下对齐" @click="alignBottom" />
-                </div>
-                <div v-if="!box.selectedElements.length">
-                    请选择节点进行编辑
-                    <br>
-                    <div>填充色</div>
-                    <input type="color" v-model="box.defaultStyle.fillColor">
-                    <div v-if="box.defaultStyle.fillColor === 'transparent'">透明</div>
-                    <button @click="box.defaultStyle.fillColor = 'transparent'">设为透明</button>
-                    <br>
-                    <div>线条颜色</div>
-                    <input type="color" v-model="box.defaultStyle.strokeColor">
-                    <br>
-                    <div>线条宽度</div>
-                    <input type="number" v-model.number="box.defaultStyle.strokeWidth">
-                    <br>
-                    <div>虚线值（0 则为实线）</div>
-                    <input type="number" v-model.number="box.defaultStyle.strokeDash">
-                </div>
-            </div>
+            
         </ui-drawer>
         <div class="template-box" v-if="templateBoxVisible">
             <ui-appbar title="模板">
@@ -171,8 +203,8 @@
                 ],
                 mode: '',
                 currElement: null,
-                attrBoxVisible: true,
-                typeBoxVisible: true,
+                attrBoxVisible: false,
+                typeBoxVisible: false,
                 templateBoxVisible: false
             }
         },
@@ -295,14 +327,14 @@
                 hostNode.setSize(64, 64);
                 hostNode.setLocation(360, 190);
                 hostNode.name = 'AAA'
-                this.box.add(hostNode);
+                // this.box.add(hostNode);
 
                 var node = new Topo.Node();
                 node.setImage('/static/img/laptop.png');
                 node.setSize(64, 64);
                 node.setLocation(200, 100)
                 node.name = 'BBB'
-                this.box.add(node);
+                // this.box.add(node);
 
                 let link = new Topo.Link({
                     node: hostNode,
@@ -313,8 +345,8 @@
                     x: 1,
                     y: 0.5
                 })
-                link.name = '哈哈'
-                this.box.add(link)
+                // link.name = '哈哈'
+                // this.box.add(link)
             },
             search() {
                 this.box.search(this.keyword)

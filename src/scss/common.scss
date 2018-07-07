@@ -24,10 +24,7 @@ body {
 .layout-header {
     border-bottom: 1px solid #ccc;
 }
-canvas {
-    background-color:#fff;
-    border:1px solid #444;
-}
+
 .layout-tool {
     position: absolute;
     top: 0;
@@ -36,7 +33,16 @@ canvas {
     height: 48px;
     // padding: 8px;
     background-color: #fff;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid $divider;
+    .content {
+        display: flex;
+        align-items: center;
+        height: 48px;
+        padding: 0 16px;
+        .btn {
+            margin-right: 8px;
+        }
+    }
 }
 .layout-body {
     position: absolute;
@@ -48,10 +54,57 @@ canvas {
 .layout-content {
     position: absolute;
     top: 48px;
-    left: 16px;
+    left: 256px;
     right: 320px;
     bottom: 0;
-    border-right: 1px solid #ccc;
+    background-color: #f9f9f9;
+    overflow: auto;
+    .editor-box {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        .editor {
+
+        }
+        .canvas {
+            background-color:#fff;
+            border:1px solid $divider;
+        }
+    }
+}
+.layout-type {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    bottom: 0;
+    width: 256px;
+    padding: 16px;
+    background-color: #fff;
+    border-right: 1px solid $divider;
+    overflow: auto;
+    .mu-icon-button {
+        border: 1px solid #999;
+    }
+    .mu-icon-button.active {
+        border: 1px solid #09c;
+    }
+}
+.layout-side {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    bottom: 0;
+    width: 320px;
+    padding: 16px;
+    background-color: #fff;
+    border-left: 1px solid $divider;
+    overflow: auto;
+    .input-sm {
+        width: 80px;
+    }
+    .margin-right {
+        margin-right: 8px;
+    }
 }
 /**/
 .attr-box {
