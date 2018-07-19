@@ -1,7 +1,26 @@
 /* eslint-disable */
-// 矩形插件
+
+// 绘制椭圆
+function ellipse(context, x, y, a, b) {
+    context.save()
+    var r = (a > b) ? a : b
+    var ratioX = a / r
+    var ratioY = b / r
+    context.scale(ratioX, ratioY)
+    context.beginPath()
+    context.arc(x / ratioX, y / ratioY, r, 0, 2 * Math.PI, false)
+    context.closePath()
+    context.restore()
+    context.stroke()
+}
+
+function myEllipse(context, x, y, width, height) {
+    ellipse(context, x + width / 2, y + height / 2, width / 2, height / 2)
+}
+
+// 椭圆插件
 let rect = {
-    name: 'rect',
+    name: 'ellipse',
     onMousedown(e, box, x, y) {
         this.isMouseDown = true,
         this.node = null
@@ -19,7 +38,7 @@ let rect = {
             }
             box.setDefaultStyle()
             box.ctx.beginPath()
-            box.ctx.rect(minX, minY, 
+            myEllipse(box.ctx, minX, minY, 
                 Math.abs(x - box.startDragMouseX), Math.abs(y - box.startDragMouseY))
             box.ctx.fill()    
             box.ctx.stroke()    
@@ -34,7 +53,7 @@ let rect = {
 
         this.node = null
 
-        var node = new Topo.Rect()
+        var node = new Topo.Ellipse()
         node.setSize(width, height)
         node.setLocation(minX, minY)
         box.setDefaultStyleToNode(node)
@@ -46,7 +65,7 @@ let rect = {
         if (this.node) {
             box.setDefaultStyle()
             box.ctx.beginPath()
-            box.ctx.rect(this.node.x, this.node.y, this.node.width, this.node.height)
+            myEllipse(box.ctx, this.node.x, this.node.y, this.node.width, this.node.height)
             box.ctx.fill()    
             box.ctx.stroke()    
         }

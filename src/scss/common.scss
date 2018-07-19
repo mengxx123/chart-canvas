@@ -1,9 +1,32 @@
 @import "var";
 
+.sub-header {
+    padding-left: 0;
+}
+.ui-file-button{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0;
+}
+.btns {
+    .btn {
+        margin-right: 8px;
+        margin-bottom: 16px;
+    }
+}
+.mu-tabs {
+    background-color: #fff;
+    border-bottom: 1px solid $divider;
+}
 body {
     background-color: #fcfcfc !important;
 }
-
+.mu-tab-text {
+    color: #333;
+}
 .ui-match-parent {
     display: block;
     width: 100%;
@@ -54,22 +77,99 @@ body {
 .layout-content {
     position: absolute;
     top: 48px;
-    left: 256px;
+    left: 274px;
     right: 320px;
     bottom: 0;
     background-color: #f9f9f9;
     overflow: auto;
-    .editor-box {
+    .editor-wrap {
         position: absolute;
-        top: 16px;
-        left: 16px;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 100%;
+        min-height: 100%;
+        overflow: auto;
+    }
+    .editor-box {
+        position: relative;
+        overflow: hidden;
+        // position: absolute;
+        // top: 16px;
+        // left: 16px;
         .editor {
-
-        }
-        .canvas {
+            flex-shrink: 0;
+            flex-grow: 0;
+            position: relative;
+            width: 800px;
+            height: 500px;
             background-color:#fff;
             border:1px solid $divider;
         }
+        .canvas-bg {
+            background-color: #fff;
+        }
+        .canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    }
+    .x-axis {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 24px;
+        background-color: #fff;
+        border-bottom: 1px solid $divider;
+        .canvas {
+            width: 100%;
+            height: 100%;
+        }
+        .point {
+            position: absolute;
+            top: 0;
+            left: 80px;
+            width: 2px;
+            height: 24px;
+            background-color: #ea4335;
+        }
+    }
+    .y-axis {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 24px;
+        background-color: #fff;
+        border-right: 1px solid $divider;
+        .canvas {
+            width: 100%;
+            height: 100%;
+        }
+        .point {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            width: 24px;
+            height: 2px;
+            background-color: #ea4335;
+        }
+    }
+    .axis-o {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 24px;
+        height: 24px;
+        background-color: #fff;
+        border-right: 1px solid $divider;
+        border-bottom: 1px solid $divider;
     }
 }
 .layout-type {
@@ -77,8 +177,8 @@ body {
     top: 48px;
     left: 0;
     bottom: 0;
-    width: 256px;
-    padding: 16px;
+    width: 274px;
+    padding: 0 16px 16px 16px;
     background-color: #fff;
     border-right: 1px solid $divider;
     overflow: auto;
@@ -95,15 +195,35 @@ body {
     right: 0;
     bottom: 0;
     width: 320px;
-    padding: 16px;
+    // padding: 16px;
     background-color: #fff;
     border-left: 1px solid $divider;
-    overflow: auto;
+    .body {
+        position: absolute;
+        top: 48px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 16px;
+        overflow: auto;
+    }
     .input-sm {
+        width: 80px;
+    }
+    .fl {
+        float: left;
+    }
+    .input-xs {
+        float: left;
         width: 80px;
     }
     .margin-right {
         margin-right: 8px;
+    }
+    .form-title {
+        margin: 8px 0;
+        color: rgba(0,0,0,.54);
+        font-size: 12px;
     }
 }
 /**/
@@ -129,15 +249,32 @@ body {
     }
 }
 .type-list {
-    margin-top: 16px;
+    overflow: hidden;
     .item {
         float: left;
+        width: 48px;
+        height: 48px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        border: 1px solid $divider;
+        border-radius: 4px;
         cursor: pointer;
         .img {
             width: 40px;
             height: 40px;
-            margin-right: 16px;
-            margin-bottom: 16px;
+            margin: 4px;
+        }
+        svg {
+            width: 40px;
+            height: 40px;
+            margin: 4px;
+        }
+        .more {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            margin: 4px;
         }
     }
 }
@@ -160,5 +297,162 @@ body {
     }
     .text {
         color: #999;
+    }
+}
+.ui-tab-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.search-btn {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.117647), 0 1px 4px rgba(0,0,0,.117647);
+}
+.search-box {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    right: 24px;
+    display: flex;
+    height: 48px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.117647), 0 1px 4px rgba(0,0,0,.117647);
+    background-color: #fff;
+    .input {
+        flex-grow: 1;
+        padding-left: 16px;
+        border: none;
+        outline: none;
+    }
+}
+.layer-empty {
+    padding: 80px 0;
+    text-align: center;
+    color: #999;
+}
+.layer-list {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-bottom: 96px;
+    overflow: auto;
+    user-select: none;
+    .item {
+        display: flex;
+        align-items: center;
+        height: 48px;
+        border-bottom: 1px solid $divider;
+    }
+    .visible {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        padding: 8px;
+        text-align: center;
+        line-height: 48px;
+        border-right: 1px solid $divider;
+        cursor: pointer;
+    }
+    .lock {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        padding: 8px;
+        text-align: center;
+        line-height: 48px;
+        border-right: 1px solid $divider;
+        cursor: pointer;
+    }
+    .ic-unlock {
+        color: #eee;
+    }
+    .ic-visible {
+        color: #666;
+    }
+    .ic-invisible {
+        color: #eee;
+    }
+    .type {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        text-align: center;
+        line-height: 48px;
+        border-right: 1px solid $divider;
+        cursor: pointer;
+    }
+    .name {
+        flex-grow: 1;
+        height: 48px;
+        line-height: 48px;
+        // cursor: pointer;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    .selected {
+        background-color: #f9f9f9;
+    }
+    .op {
+        margin-left: auto;
+        // margin-right: 16px;
+    }
+    .input {
+        width: 100%;
+        height: 46px;
+        padding-left: 16px;
+        border: none;
+        outline: none;
+        background-color: transparent;
+    }
+    .svg {
+        width: 36px;
+        height: 36px;
+        margin: 6px;
+    }
+    .image {
+        max-width: 36px;
+        max-height: 36px;
+        margin: 6px;
+    }
+}
+.elem-menu {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    width: 160px !important;
+    z-index: 100000;
+    background-color: #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,.117647), 0 1px 4px rgba(0,0,0,.117647);
+    overflow: hidden;
+}
+.mode-list {
+    overflow: hidden;
+    .item {
+        float: left;
+        width: 48px;
+        height: 48px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        text-align: center;
+        line-height: 48px;
+        border: 1px solid $divider;
+        border-radius: 4px;
+        cursor: pointer;
+        &.active {
+            border-color: #09c;
+        }
+    }
+}
+.form-item {
+    margin-bottom: 8px;
+    .input {
+        width: 160px;
+        margin-right: 8px;
     }
 }

@@ -1,11 +1,13 @@
-import Element from './element'
+import {Node} from './node'
+
 /* eslint-disable */
-class Link extends Element {
+class Link extends Node {
 
     constructor(nodeA, nodeB) {
-        super()
+        super(null)
         this.nodeA = nodeA
         this.nodeB = nodeB
+        this.type = 'link'
         // TODO 跟 Node 重复
         this.style = {
             strokeColor: '#666',
@@ -40,6 +42,45 @@ class Link extends Element {
         this.drawText(ctx)
     }
 
+    drawCorePath(ctx) {
+        // ctx.moveTo(startPt.x, startPt.y)
+        // ctx.lineTo(endPt.x, endPt.y)
+        // ctx.arc(0, 0, 10, 0, Math.PI * 2)
+    }
+
+    getControlPts() {
+        return [
+        ]
+    }
+
+    get x() {
+        return Math.min(this.getStartPt().x, this.getEndPt().x)
+    }
+
+    set x(value) {
+    }
+
+    get y() {
+        return Math.min(this.getStartPt().y, this.getEndPt().y)
+    }
+
+    set y(value) {
+    }
+
+    get width() {
+        return Math.abs(this.getStartPt().x - this.getEndPt().x)
+    }
+
+    set width(value) {
+    }
+
+    get height() {
+        return Math.abs(this.getStartPt().y - this.getEndPt().y)
+    }
+
+    set height(value) {
+    }
+
     drawText(ctx) {
         if (this.name) {
             let startPt = this.getStartPt()
@@ -70,16 +111,30 @@ class Link extends Element {
     }
 
     getStartPt() {
-        return {
-            x: this.nodeA.node.x + this.nodeA.node.width * this.nodeA.x,
-            y:  this.nodeA.node.y + this.nodeA.node.height * this.nodeA.y
+        if (this.nodeA.node) {
+            return {
+                x: this.nodeA.node.x + this.nodeA.node.width * this.nodeA.x,
+                y:  this.nodeA.node.y + this.nodeA.node.height * this.nodeA.y
+            }
+        } else {
+            return {
+                x: this.nodeA.x,
+                y: this.nodeA.y
+            }
         }
     }
 
     getEndPt() {
-        return {
-            x: this.nodeB.node.x + this.nodeB.node.width * this.nodeB.x,
-            y:  this.nodeB.node.y + this.nodeB.node.height * this.nodeB.y
+        if (this.nodeB.node) {
+            return {
+                x: this.nodeB.node.x + this.nodeB.node.width * this.nodeB.x,
+                y:  this.nodeB.node.y + this.nodeB.node.height * this.nodeB.y
+            }
+        } else {
+            return {
+                x: this.nodeB.x,
+                y: this.nodeB.y
+            }
         }
     }
 

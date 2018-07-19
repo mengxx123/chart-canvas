@@ -2,9 +2,12 @@
 import DataBox from './databox'
 import Element from './element'
 import AbstractNode from './abstractnode'
+import Path from './path'
+import Text from './text'
+import Ellipse from './ellipse'
 import {Node, CircleNode, GhomboidNode, TipNode, TextNode, HeartNode, UMLClassNode, EndPointNode} from './node'
 import {Container, GridContainer, OneItemContainer, GhomboidContainer} from './container'
-import {Rect, Circle, Line} from './rect'
+import {Rect, Circle, Line, Image} from './rect'
 import {Link, FoldLink, CurveLink, ArrowsLink, ArrowsFoldLink} from './link'
 
 var Topo = {
@@ -31,7 +34,11 @@ var Topo = {
     Container: Container,
     GridContainer: GridContainer,
     OneItemContainer: OneItemContainer,
-    GhomboidContainer: GhomboidContainer
+    GhomboidContainer: GhomboidContainer,
+    Image: Image,
+    Path: Path,
+    Text: Text,
+    Ellipse: Ellipse
 }
 
 window.Topo = Topo

@@ -2,7 +2,7 @@
 class Element {
 
     constructor() {
-        this.id = 'topo_' + new Date().getTime() // TODO
+        // this.id = 'topo_' + new Date().getTime() + Math.random() * 100000
         this.getFloatMenu = null
         this.floatMenuVisible = false
         this.visible = true
@@ -102,11 +102,10 @@ class Element {
     }
 
     onMousedown(e) {
-        console.log(this)
-        this.setSelected(true)
-        this.mousedownX = e.x
-        this.mousedownY = e.y
-        this.selectedLocation = {x: this.x, y: this.y}
+        // this.setSelected(true)
+        // this.mousedownX = e.x
+        // this.mousedownY = e.y
+        // this.selectedLocation = {x: this.x, y: this.y}
     }
 
     onMouseselected() {

@@ -4,7 +4,7 @@ import util from '../util'
 // 连线插件
 export default {
     name: 'join',
-    onMousedown(box, x, y) {
+    onMousedown(e, box, x, y) {
         if (this.activePt) {
             this.startJoin = true
             this.startNode = this.hoverNode
@@ -14,10 +14,9 @@ export default {
                 x: this.activePt.relativeX,
                 y: this.activePt.relativeY
             }
-            console.log('完全OK')
         }
     },
-    onMousemove(box, x, y) {
+    onMousemove(e, box, x, y) {
         this._curX = x
         this._curY = y
         
@@ -40,12 +39,14 @@ export default {
         box.canvas.style.cursor = 'default'
         for (var i = box.nodes.length - 1; i >= 0; i--) {
             var node = box.nodes[i]
+            if (node.type === 'link') {
+                continue
+            }
             if (node.x + node.width < 0 || node.x > box.canvas.width) continue
             
             if (x > node.x - offset && x < node.x + node.width + offset
                     && y > node.y - offset && y < node.y + node.height + offset) {
                 box.ctx.strokeStyle = '#000'
-                console.log('hover')
                 this.hoverNode = node
                 
                 this.joinPts = [
@@ -79,11 +80,9 @@ export default {
                     }
                 ]
                 for (let pt of this.joinPts) {
-                    console.log(util.getDistance(node, {x: pt.x, y: pt.y}))
                     if (util.getDistance({x: this._curX, y: this._curY}, {x: pt.x, y: pt.y}) < 10) {
                         this.activePt = pt
                         box.canvas.style.cursor = 'crosshair'
-                        console.log('啦啦')
                     }
                 }
             } else {
@@ -99,7 +98,7 @@ export default {
             }
         }
     },
-    onMouseup(box, x, y) {
+    onMouseup(e, box, x, y) {
         let minX = Math.min(x, box.startDragMouseX)
         let minY = Math.min(y, box.startDragMouseY)
         let width = Math.abs(x - box.startDragMouseX)
@@ -111,26 +110,18 @@ export default {
         if (this.activePt) {
             this.startX = x
             this.startY = y
-            console.log('非常OK')
-            console.log(this.startNode.id)
-            console.log(this.hoverNode.id)
             if (this.startNode.id === this.hoverNode.id && this.startPt.x === this.activePt.relativeX
                 && this.startPt.y === this.activePt.relativeY) {
-                console.log('删除线')
                 for (let link of box.links) {
                     if (link.nodeA.node.id === this.startNode.id) {
                         if (link.nodeA.x === this.startPt.x && link.nodeA.y === this.startPt.y) {
-                            console.log(link.id)
                             box.removeElementById(link.id)
-                            console.log(box.links)
                             break
                         }
                     }
                     if (link.nodeB.node.id === this.startNode.id) {
                         if (link.nodeB.x === this.startPt.x && link.nodeB.y === this.startPt.y) {
-                            console.log(link.id)
                             box.removeElementById(link.id)
-                            console.log(box.links)
                             break
                         }
                     }
@@ -164,13 +155,15 @@ export default {
     },
     draw(box) {
         if (this.joinPts && this.joinPts.length) {
-            box.ctx.lineWidth = 1
+            box.ctx.lineWidth = 2
             box.ctx.strokeStyle = '#000'
+            box.ctx.fillStyle = '#fff'
             box.ctx.setLineDash([])
             for (let pt of this.joinPts) {
                 box.ctx.beginPath()
                 box.ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI)
                 box.ctx.stroke()
+                box.ctx.fill()
             }
         }
         if (this.joinLine) {

@@ -4,7 +4,7 @@ class Node extends AbstractNode {
     constructor(name) {
         super()
 
-        console.log(name)
+        this.type = 'node'
         this.name = name
         this.x = 0
         this.y = 0
@@ -16,35 +16,115 @@ class Node extends AbstractNode {
             fillColor: '#ff0000',
             strokeDash: 0,
             fontSize: '10pt',
-            font: "Consolas"
+            font: "Consolas",
+            textColor: '#000',
+            textSize: 16
         }
         this.type = null
         this.selected = false
-
+        this.lock = false
+        this.drawName = false
         this.alpha = 1
         this.scala = 1
         this.rotate = 0
     }
 
+    getControlPts() {
+        let x = this.x
+        let y = this.y
+        let width = this.getWidth()
+        let height = this.getHeight()
+        return [
+            {
+                name: 'top',
+                x: x + width / 2,
+                y: y,
+                cursor: 'n-resize'
+            },
+            {
+                name: 'right_top',
+                x: x + width,
+                y: y,
+                cursor: 'ne-resize'
+            },
+            {
+                name: 'right',
+                x: x + width,
+                y: y + height / 2,
+                cursor: 'e-resize'
+            },
+            {
+                name: 'right_bottom',
+                x: x + width,
+                y: y + height,
+                cursor: 'se-resize'
+            },
+            {
+                name: 'bottom',
+                x: x + width / 2,
+                y: y + height,
+                cursor: 's-resize'
+            },
+            {
+                name: 'left_bottom',
+                x: x,
+                y: y + height,
+                cursor: 'sw-resize'
+            },
+            {
+                name: 'left',
+                x: x,
+                y: y + height / 2,
+                cursor: 'w-resize'
+            },
+            {
+                name: 'left_top',
+                x: x,
+                y: y,
+                cursor: 'nw-resize'
+            }
+        ]
+    }
+
+    isPointInPath(x, y) {
+        return x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height
+    }
+
     setContextStyle(ctx) {
-        ctx.fillStyle = this.style.fillColor
-        ctx.strokeStyle = this.style.strokeColor
-        ctx.lineWidth = this.style.strokeWidth
+        ctx.fillStyle = this.style.fillColor ? this.style.fillColor : 'transparent'
+        ctx.strokeStyle = this.style.strokeColor ? this.style.strokeColor : 'transparent'
+        ctx.lineWidth = this.style.strokeWidth || 0
         ctx.setLineDash([this.style.strokeDash])
     }
 
     drawText(ctx) {
-        let name = this.getName()
-        if (!name || name == '') return
-        let textWidth = ctx.measureText(name).width
+        if (!this.text) {
+            return
+        }
+        ctx.font = this.style.textSize + 'px ' + this.style.font
+        ctx.lineWidth = 1
+        ctx.strokeStyle = this.style.textColor
+        ctx.fillStyle = this.style.textColor
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.setLineDash([])
+        ctx.beginPath()
+        ctx.fillText(this.text, this.x + this.width / 2, this.y + this.height / 2)
+    }
+
+    _drawName(ctx) {
+        if (!this.name || !this.drawName) {
+            return
+        }
+        let textWidth = ctx.measureText(this.name).width
         ctx.font = this.style.fontSize + ' ' + this.style.font
-        // ctx.strokeStyle = 'rgba(230, 230, 230, ' + this.alpha + ')'
         ctx.lineWidth = 1
         ctx.strokeStyle = '#666'
         ctx.fillStyle = '#666'
+        ctx.textAlign = 'center'
         ctx.setLineDash([])
         ctx.beginPath()
-        ctx.fillText(name, -this.width / 2 + (this.width - textWidth) / 2, this.height / 2 + 20)
+        ctx.fillText(this.name, this.x + this.width / 2, this.y + this.height + 20)
     }
 
     drawTip(ctx) {
@@ -68,7 +148,7 @@ class Node extends AbstractNode {
 
     drawSelectedRect(ctx) {
         ctx.save()
-        ctx.translate(this.x + this.width / 2, this.y + this.height / 2)
+        ctx.translate(this.x + this.getWidth() / 2, this.y + this.getHeight() / 2)
         ctx.rotate(this.rotate)
         ctx.scale(this.scala, this.scala)
 
@@ -79,16 +159,22 @@ class Node extends AbstractNode {
 
         let strokeStyle = '#09c'
         if (this.isSelected()) {
-            strokeStyle = '#009688'
+            // strokeStyle = '#009688'
+            strokeStyle = '#000'
         }
 
-        ctx.lineWidth = 2
+        ctx.lineWidth = 4
         ctx.strokeStyle = strokeStyle
         ctx.setLineDash([])
-        ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height)
+        this.drawCorePath(ctx)
+        
         ctx.stroke()
         ctx.closePath()
         ctx.restore()
+    }
+
+    drawCorePath(ctx) {
+        ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height)
     }
 
     draw(ctx) {

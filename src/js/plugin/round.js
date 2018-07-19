@@ -2,7 +2,7 @@
 // 圆形插件
 export default {
     name: 'round',
-    onMousemove(box, x, y) {
+    onMousemove(e, box, x, y) {
         if (box.isOnMouseDown) {
             let minX = Math.min(x, box.startDragMouseX)
             let minY = Math.min(y, box.startDragMouseY)
@@ -15,7 +15,7 @@ export default {
             }
         }
     },
-    onMouseup(box, x, y) {
+    onMouseup(e, box, x, y) {
         this.node = null
         let radius = Math.sqrt(Math.pow(x - box.startDragMouseX, 2) + Math.pow(y - box.startDragMouseY, 2))
         var node = new Topo.Circle()
@@ -27,7 +27,6 @@ export default {
     },
     draw(box) {
         if (this.node) {
-            console.log('画矩形')
             box.setDefaultStyle()
             box.ctx.beginPath()
             box.ctx.arc(this.node.x, this.node.y, this.node.r, 0, 2 * Math.PI)

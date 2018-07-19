@@ -2,7 +2,7 @@
 // 直线插件
 export default {
     name: 'line',
-    onMousemove(box, x, y) {
+    onMousemove(e, box, x, y) {
         if (box.isOnMouseDown) {
             this.node = {
                 x: box.startDragMouseX,
@@ -12,7 +12,7 @@ export default {
             }
         }
     },
-    onMouseup(box, x, y) {
+    onMouseup(e, box, x, y) {
         this.node = null
         let minX = Math.min(x, box.startDragMouseX)
         let minY = Math.min(y, box.startDragMouseY)
@@ -30,7 +30,6 @@ export default {
     },
     draw(box) {
         if (this.node) {
-            console.log('画矩形')
             box.setDefaultStyle()
 
             box.setDefaultStyle()

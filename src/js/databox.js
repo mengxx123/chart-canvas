@@ -25,7 +25,8 @@ class DataBox {
         this.plugins = []
         this.selection = null // 选区
         this.defaultStyle = {
-            fillColor: 'transparent',
+            // fillColor: 'transparent',
+            fillColor: null,
             strokeColor: '#000000',
             strokeWidth: 1,
             strokeDash: 0,
@@ -74,16 +75,16 @@ class DataBox {
     }
 
     setDefaultStyle() {
-        this.ctx.fillStyle = this.defaultStyle.fillColor
+        this.ctx.fillStyle = this.defaultStyle.fillColor || 'transparent'
         this.ctx.lineWidth = this.defaultStyle.strokeWidth
-        this.ctx.strokeStyle = this.defaultStyle.strokeColor
+        this.ctx.strokeStyle = this.defaultStyle.strokeColor || 'transparent'
         this.ctx.setLineDash([this.defaultStyle.strokeDash])
     }
 
     setDefaultStyleToNode(node) {
-        node.style.fillColor = this.defaultStyle.fillColor
+        node.style.fillColor = this.defaultStyle.fillColor || 'transparent'
         node.style.strokeWidth = this.defaultStyle.strokeWidth
-        node.style.strokeColor = this.defaultStyle.strokeColor
+        node.style.strokeColor = this.defaultStyle.strokeColor || 'transparent'
         node.style.strokeDash = this.defaultStyle.strokeDash
     }
 
@@ -105,7 +106,10 @@ class DataBox {
         var e = null
         for (var i = this.nodes.length - 1; i >= 0; i--) {
             var node = this.nodes[i]
-            if (x > node.x && x < node.x + node.width && y > node.y && y < node.y + node.height) {
+            if (!node.visible || node.lock) {
+                continue
+            }
+            if (node.isPointInPath(x, y)) {
                 e = node
                 break
             }
@@ -179,7 +183,7 @@ class DataBox {
         box.publish('mousedown', {target: box.currElement, x: x, y: y, context: box})
         for (let plugin of this.plugins) {
             if (plugin.name === this.mode) {
-                plugin.onMousedown && plugin.onMousedown(this, xy.x, xy.y)
+                plugin.onMousedown && plugin.onMousedown(event, this, xy.x, xy.y)
                 break
             }
         }
@@ -196,7 +200,7 @@ class DataBox {
 
         for (let plugin of this.plugins) {
             if (plugin.name === this.mode) {
-                plugin.onMousemove && plugin.onMousemove(this, xy.x, xy.y)
+                plugin.onMousemove && plugin.onMousemove(event, this, xy.x, xy.y)
                 break
             }
         }
@@ -214,7 +218,7 @@ class DataBox {
 
         for (let plugin of this.plugins) {
             if (plugin.name === this.mode) {
-                plugin.onMouseup && plugin.onMouseup(this, xy.x, xy.y)
+                plugin.onMouseup && plugin.onMouseup(event, this, xy.x, xy.y)
                 break
             }
         }
@@ -261,6 +265,7 @@ class DataBox {
                         elem.x += grid
                     })
                 }
+                e.preventDefault()
                 return false
             case 40: // down arrow and S
             case 83:
@@ -273,6 +278,7 @@ class DataBox {
                         elem.y += grid
                     })
                 }
+                e.preventDefault()
                 return false
             case 37: // left arrow and A
             case 65:
@@ -287,6 +293,7 @@ class DataBox {
                         elem.x -= grid
                     })
                 }
+                e.preventDefault()
                 return false
             case 17:
                 this.ctrlDown = true
@@ -316,7 +323,7 @@ class DataBox {
     }
 
     removeElementById(id) {
-        for (var i = 0; i < this.elements.length; i++) {
+        for (let i = 0; i < this.elements.length; i++) {
             if (this.elements[i].id == id) {
                 this.remove(this.elements[i])
                 break
@@ -325,11 +332,20 @@ class DataBox {
     }
 
     remove(element) {
+        if (element.selected) {
+            for (let i = 0; i < this.selectedElements.length; i++) {
+                if (this.selectedElements[i].id === element.id) {
+                    this.selectedElements.splice(i, 1)
+                    break
+                }
+            }
+        }
         this.elements = this.elements.del(element)
         this.containers = this.containers.del(element)
         this.links = this.links.del(element)
         this.nodes = this.nodes.del(element)
         this.elementMap[element.id] = element
+
     }
 
     // 移除所有选中的元素
@@ -367,8 +383,10 @@ class DataBox {
         if (element instanceof Container) {
             this.containers.push(element)
         } else if (element instanceof Link) {
-            this.links.push(element)
-        } else if (element instanceof Node) {
+            // this.links.push(element)
+            this.nodes.push(element)
+        } else {
+            // element instanceof Node
             this.nodes.push(element)
         }
         this.elementMap[element.id] = element
@@ -511,21 +529,59 @@ class DataBox {
             this.containers[i].draw(this.ctx)
         }
 
+        let hasResize = false
+        this._resizePts = []
         for (let node of this.nodes) {
             if (node.x + node.width < 0 || node.x > box.canvas.width) {
                 continue
             }
-            node.draw(this.ctx)
+            node.draw(this.ctx, this.canvas)
+            node.drawText(this.ctx, this.canvas)
+            node._drawName(this.ctx, this.canvas)
             if (node.isSelected() || node.isFocus()) {
                 node.drawSelectedRect(this.ctx)
+                if (node.isSelected() && !hasResize) {
+                    hasResize = true
+                    if (this.selectedElements.length === 1) {
+                        this.drawResizeBox(node)
+                    }
+                }
             }
         }
 
+        // plugin
         for (let plugin of this.plugins) {
             if (plugin.name === this.mode) {
                 plugin.draw && plugin.draw(this)
                 break
             }
+        }
+    }
+
+    drawResizeBox(node) {
+        this.ctx.lineWidth = 2
+        this.ctx.strokeStyle = '#000'
+        this.ctx.fillStyle = '#000'
+        this.ctx.beginPath()
+        let x = node.x
+        let y = node.y
+        let width = node.getWidth()
+        let height = node.getHeight()
+        this.ctx.rect(node.x, node.y, node.getWidth(), node.getHeight())
+        this.ctx.stroke()
+
+        function drawCircle(ctx, x, y) {
+            ctx.lineWidth = 2
+            ctx.fillStyle = '#fff'
+            ctx.beginPath()
+            ctx.arc(x, y, 4, 0, Math.PI * 2)
+            ctx.fill()
+            ctx.stroke()
+        }
+        this._resizeNode = node
+        this._resizePts = node.getControlPts()
+        for (let pt of this._resizePts) {
+            drawCircle(this.ctx, pt.x, pt.y)
         }
     }
 
@@ -567,6 +623,175 @@ class DataBox {
         this.canvas.onmouseup = null
         window.removeEventListener('keydown', this.onKeydown)
         window.addEventListener('keyup', this.onKeyup)
+    }
+
+    moveIndexTop() {
+        for (let i = 0; i < this.nodes.length; i++) {
+            if (this.nodes[i].id === this.currElement.id) {
+                this.nodes.splice(i, 1)
+                break
+            }
+        }
+        this.nodes.unshift(this.currElement)
+    }
+
+    moveIndexBottom() {
+        for (let i = 0; i < this.nodes.length; i++) {
+            if (this.nodes[i].id === this.currElement.id) {
+                this.nodes.splice(i, 1)
+                break
+            }
+        }
+        this.nodes.push(this.currElement)
+    }
+
+    moveIndexUp() {
+        for (let i = 0; i < this.nodes.length; i++) {
+            if (this.nodes[i].id === this.currElement.id) {
+                if (i !== this.nodes.length - 1) {
+                    this.nodes.splice(i, 1)
+                    this.nodes.splice(i + 1, 0, this.currElement)
+                }
+                break
+            }
+        }
+    }
+
+    moveIndexDown() {
+        for (let i = 0; i < this.nodes.length; i++) {
+            if (this.nodes[i].id === this.currElement.id) {
+                if (i !== 0) {
+                    this.nodes.splice(i, 1)
+                    this.nodes.splice(i - 1, 0, this.currElement)
+                }
+                break
+            }
+        }
+    }
+
+    alignLft() {
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].x = 0
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].x = this.selectedElements[0].x
+            }
+        }
+    }
+
+    alignCenter() {
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].x = (this.width - this.selectedElements[0].width) / 2
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].x = this.selectedElements[0].x +
+                    this.selectedElements[0].width / 2 - this.selectedElements[i].width / 2
+            }
+        }
+    }
+
+    alignRight() {
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].x = this.width - this.selectedElements[0].width
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].x = this.selectedElements[0].x +
+                    this.selectedElements[0].width - this.selectedElements[i].width
+            }
+        }
+    }
+
+    alignTop() {
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].y = 0
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].y = this.selectedElements[0].y
+            }
+        }
+    }
+
+    alignMiddle() {
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].y = (this.height - this.selectedElements[0].height) / 2
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].y = this.selectedElements[0].y +
+                    this.selectedElements[0].height / 2 - this.selectedElements[i].height / 2
+            }
+        }
+    }
+
+    alignBottom() {
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].y = this.height - this.selectedElements[0].height
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].y = this.selectedElements[0].y +
+                    this.selectedElements[0].height - this.selectedElements[i].height
+            }
+        }
+    }
+
+    alignWidth(widthScale) {
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].width = this.width * widthScale
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].width = this.selectedElements[0].width * widthScale
+            }
+        }
+    }
+
+    alignHeight(heightScale) {
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].height = this.height * heightScale
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].height = this.selectedElements[0].height * heightScale
+            }
+        }
+    }
+
+    alignOffsetX(offset) {
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].x = offset
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].x = this.selectedElements[i - 1].x + this.selectedElements[i - 1].width + offset
+            }
+        }
+    }
+
+    alignOffsetY(offset) {
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].y = offset
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].y = this.selectedElements[i - 1].y + this.selectedElements[i - 1].height + offset
+            }
+        }
+    }
+
+    alignOffsetX2(offset) {
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].x = offset
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].x = this.selectedElements[i - 1].x + offset
+            }
+        }
+    }
+
+    alignOffsetY2(offset) {
+        console.log('什么情况')
+        if (this.selectedElements.length === 1) {
+            this.selectedElements[0].y = offset
+        } else {
+            for (let i = 1; i < this.selectedElements.length; i++) {
+                this.selectedElements[i].y = this.selectedElements[i - 1].y + offset
+            }
+        }
     }
 }
 
